@@ -6,7 +6,7 @@
   "icon": "resources/logo.png",
   "repository": {
     "type": "git",
-    "url": "https://github.com/gargadobe/aem-copilot"
+    "url": "https://github.com/adobe/aem-copilot"
   },
   "version": "0.0.1",
   "engines": {
