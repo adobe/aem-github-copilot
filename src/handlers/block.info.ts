@@ -8,8 +8,7 @@ export async function infoCmdHandler(
   request: vscode.ChatRequest,
   stream: vscode.ChatResponseStream,
   token: vscode.CancellationToken
-) {
-  stream.progress(vscode.l10n.t("Let me think how i can help you...?"));
+): Promise < { metadata: { command: string } } >  {
   const userQuery = request.prompt;
   const props: PromptProps = {
     userQuery: userQuery,

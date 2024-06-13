@@ -12,6 +12,7 @@ import {
 } from "./constants";
 import { createFolderAndFiles } from "./utils/fileHandler";
 import { fetchBlock } from "./handlers/block.collections";
+import { getRandomGreeting } from "./utils/helpers";
 
 interface IAemChatResult extends vscode.ChatResult {
   metadata: {
@@ -28,6 +29,7 @@ export function activate(context: vscode.ExtensionContext) {
     token: vscode.CancellationToken
   ): Promise<IAemChatResult> => {
     let cmdResult: any;
+    stream.progress(vscode.l10n.t(getRandomGreeting()));
     try {
       if (request.command == commands.INFO) {
         cmdResult = await infoCmdHandler(request, stream, token);

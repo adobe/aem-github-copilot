@@ -3,6 +3,7 @@ import * as vscode from 'vscode';
 // AEM Constants
 export const AEM_COMMAND_ID = "aem";
 export const PROCESS_COPILOT_CREATE_CMD = "aem.createFiles";
+export const PROCESS_COPILOT_CREATE_CMD_TITLE = "Create Block";
 export const COPILOT_CREATE_CMD = "AEM block with base template";
 
 // Github Repository Details
@@ -18,9 +19,13 @@ export const MODEL_SELECTOR: vscode.LanguageModelChatSelector = { vendor: MODEL_
 
 
 export const GREETINGS = [
-    "Let me think how I can help you...",
-    "Just a moment, I'm thinking...",
-    "Give me a second, I'm on it...",
-    "Hold on, let me figure this out...",
-    "One moment, I'm processing your request..."
+    "Let me think how I can help you... 🤔",
+    "Just a moment, I'm thinking... 💭",
+    "Give me a second, I'm on it... ⏳",
+    "Hold on, let me figure this out... 🧐",
+    "One moment, I'm processing your request... ⏲️",
+    "Working on your request... 🚀",
+    "Let's see what we can do... 🕵️‍♂️",
+    "Let's get this sorted... 🗂️",
+    "Hang tight, I'm on the case... 🕵️‍♀️"
 ];

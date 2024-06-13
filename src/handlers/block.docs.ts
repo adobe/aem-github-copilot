@@ -61,12 +61,6 @@ export async function handleDocsCommand(
     stream: vscode.ChatResponseStream,
     token: vscode.CancellationToken
 ): Promise<{ metadata: { command: string } }> {
-    const progressStr = vscode.l10n.t(
-        "Let me check how I can help you today..."
-    );
-    stream.progress(progressStr);
-
-
     const hits = await search(request.prompt, 2);
     if (!hits) {
         stream.markdown(vscode.l10n.t('I could not find an answer to your question. Please try again.'));

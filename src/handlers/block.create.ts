@@ -2,6 +2,7 @@ import * as vscode from "vscode";
 import { AEM_COMMANDS as commands } from "../aem.commands";
 import {
   PROCESS_COPILOT_CREATE_CMD,
+  PROCESS_COPILOT_CREATE_CMD_TITLE,
 } from "../constants";
 import { getChatResponse, parseEDSblockJson } from "../utils/helpers";
 import { CreateBlockPrompt } from "../prompts/create.block";
@@ -11,10 +12,6 @@ export async function createCmdHandler(
   stream: vscode.ChatResponseStream,
   token: vscode.CancellationToken
 ): Promise<{ metadata: { command: string } }> {
-
-  const progressStr = vscode.l10n.t("Creating AEM block...");
-  stream.progress(progressStr);
-
   const promptProps = {
     userQuery: request.prompt,
   }
@@ -30,7 +27,7 @@ export async function createCmdHandler(
 
     stream.button({
       command: PROCESS_COPILOT_CREATE_CMD,
-      title: vscode.l10n.t(PROCESS_COPILOT_CREATE_CMD),
+      title: vscode.l10n.t(PROCESS_COPILOT_CREATE_CMD_TITLE),
       arguments: [JSON.parse(resultJsonStr).files],
     });
   } catch (error) {

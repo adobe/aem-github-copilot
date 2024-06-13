@@ -249,9 +249,6 @@ export async function getChatResponse<T extends PromptElementCtor<P, any>, P ext
   }
 }
 
-
-
-
 export const getRandomGreeting = () => {
     return GREETINGS[Math.floor(Math.random() * GREETINGS.length)];
 }
