@@ -1,72 +1,10 @@
 import * as vscode from "vscode";
-import * as path from "path";
-import * as fs from "fs";
-
-import { AEM_BLOCK_COLLECTION_URL } from "./constants";
+import { AEM_BLOCK_COLLECTION_URL, GREETINGS, MODEL_SELECTOR } from "../constants";
 
 import { JSDOM } from 'jsdom';
-
-export async function createFileWithContent(
-  filePath: string,
-  content: string
-): Promise<void> {
-  const fileUri = vscode.Uri.file(filePath);
-  await vscode.workspace.fs.writeFile(fileUri, Buffer.from(content, "utf8"));
-}
-
-export async function createFolderAndFiles(files: any[]): Promise<void> {
-  const workspaceFolders = vscode.workspace.workspaceFolders;
-  if (workspaceFolders) {
-    const baseUri = workspaceFolders[0].uri;
-    await vscode.window.withProgress(
-      {
-        location: vscode.ProgressLocation.Notification,
-        title: "Creating files",
-        cancellable: false,
-      },
-      async (progress) => {
-        if (files.length > 0) {
-          // split files[0] by / and if first starts with blocks and second would represent the block name , check if that folder exist then delete that
-          const blockName = files[0].path.split("/")[1];
-          const blockPath = path.join(baseUri.fsPath, "/blocks/" + blockName);
-          if (fs.existsSync(blockPath
-          )) {
-            fs.rmdirSync(blockPath, { recursive: true });
-          }
-        }
-
-        for (let i = 0; i < files.length; i++) {
-          const file = files[i];
-          const newFilePath = vscode.Uri.joinPath(baseUri, file.path);
-          const dirPath = path.dirname(newFilePath.fsPath);
-          fs.mkdirSync(dirPath, { recursive: true });
-          try {
-            await vscode.workspace.fs.stat(newFilePath);
-          } catch (err) {
-            await createFileWithContent(newFilePath.fsPath, file.content);
-            const document = await vscode.workspace.openTextDocument(
-              newFilePath
-            ); // open the document
-            const editor = await vscode.window.showTextDocument(document); // show the document in the editor
-            await vscode.commands.executeCommand(
-              "editor.action.formatDocument"
-            ); // format the document
-          }
-          progress.report({
-            increment: 100.0 / files.length,
-            message: `Creating file: ${file.path}`,
-          });
-        }
-      }
-    );
-  }
-}
-
-interface File {
-  name: string;
-  path: string;
-  content?: string;
-}
+import { PromptElementCtor, renderPrompt } from "@vscode/prompt-tsx";
+import { PromptProps } from "../interfaces/promptInterfaces";
+import { File } from "../interfaces/fileinterface";
 
 /**
  * Parses a string into a JSON object containing file information using regular expressions,
@@ -265,3 +203,52 @@ export async function recursiveEDSContent(parentObj: any, folderPath: string) {
   }
 }
 
+
+export async function getProjectLevelStyles(): Promise<string> {
+  const STYLES_PATH = "styles/styles.css";
+  try {
+    const projectLevelStylesUri = vscode.Uri.joinPath(
+      vscode.workspace.workspaceFolders![0].uri,
+      STYLES_PATH
+    );
+
+    const projectLevelStylesFile = await vscode.workspace.fs.readFile(
+      projectLevelStylesUri
+    );
+    return projectLevelStylesFile.toString();
+  } catch (error) {
+    console.error("Error reading project level styles", error);
+    return "";
+  }
+}
+
+
+
+/**
+ * This function is used to get a chat response from a language model.
+ * 
+ * @param {T} prompt - A constructor for a prompt element. This should be a class that extends PromptElementCtor<P, any>.
+ * @param {P} promptProps - The properties for the prompt element.
+ * @param {vscode.CancellationToken} token - A cancellation token that can be used to cancel the operation.
+ * 
+ * @returns {Promise<Thenable<vscode.LanguageModelChatResponse>>} - A promise that resolves to a thenable that yields a chat response from the language model.
+ * 
+ * @throws {Error} - Throws an error if no language model is found.
+ */
+export async function getChatResponse<T extends PromptElementCtor<P, any>, P extends PromptProps>(prompt:T, promptProps: P, token: vscode.CancellationToken): Promise<Thenable<vscode.LanguageModelChatResponse>> {
+  const [model] = await vscode.lm.selectChatModels(MODEL_SELECTOR);
+  if (model) {
+    const { messages } = await renderPrompt(
+      prompt,
+      promptProps,
+      { modelMaxPromptTokens: model.maxInputTokens },
+      model);
+    return await model.sendRequest(messages, {}, token);
+  } else {
+    throw new Error("No model found");
+  }
+}
+
+export const getRandomGreeting = () => {
+    return GREETINGS[Math.floor(Math.random() * GREETINGS.length)];
+}

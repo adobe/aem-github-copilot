@@ -1,12 +1,9 @@
 import * as vscode from 'vscode';
 import { AEM_COMMANDS as commands } from "../aem.commands";
-
-const SYSTEM_MESSAGE = 'You are a customer support agent specialized in AEM projects. You are answering questions based on a set of provided documents by the assistent. ' +
-    'The provided documents are formated in JSON format, with each containing at least a title, a content and a url. ' +
-    'Whenever you use content from one of the documents, attribute this with the url of the document. ' +
-    'If you are not sure, answer with "I can only answer questions about AEM. "'
-
-const MODEL_SELECTOR: vscode.LanguageModelChatSelector = { vendor: 'copilot', family: 'gpt-3.5-turbo' };
+import { MODEL_SELECTOR } from '../constants';
+import { DocsPrompt } from '../prompts/block.docs';
+import { getChatResponse } from '../utils/helpers';
+import { DocsPromptProps } from '../interfaces/promptInterfaces';
 
 const INDEX_URL: string = "https://www.aem.live/docpages-index.json";
 
@@ -59,53 +56,28 @@ async function search(query: string, limit: number = 4): Promise<any[] | null> {
     return limitedHits;
 }
 
-function getPrompt(hits: any[], question: string): any[] {
-    const prompt = `${question}?`;
-    return [
-        {
-            role: 'system',
-            content: SYSTEM_MESSAGE,
-        },
-        {
-            role: 'assistant',
-            content: JSON.stringify(hits),
-        },
-        {
-            role: 'user',
-            content: prompt,
-        },
-    ];
-}
-
 export async function handleDocsCommand(
     request: vscode.ChatRequest,
     stream: vscode.ChatResponseStream,
     token: vscode.CancellationToken
 ): Promise<{ metadata: { command: string } }> {
-    const progressStr = vscode.l10n.t(
-        "Let me check how I can help you today..."
-    );
-    stream.progress(progressStr);
-
-
     const hits = await search(request.prompt, 2);
     if (!hits) {
-        stream.markdown('I could not find an answer to your question. Please try again.');
+        stream.markdown(vscode.l10n.t('I could not find an answer to your question. Please try again.'));
     } else {
         const [model] = await vscode.lm.selectChatModels(MODEL_SELECTOR);
         if (model) {
-            const prompt = getPrompt(hits, request.prompt);
-            const messages = [];
-            for (const m of prompt) {
-                messages.push(vscode.LanguageModelChatMessage.User(m.content));
-            }
-            const chatResponse = await model.sendRequest(messages, {}, token);
+            const promptProps: DocsPromptProps = {
+                userQuery: request.prompt,
+                hits: JSON.stringify(hits),
+            };
+            const chatResponse = await getChatResponse(DocsPrompt, promptProps, token)
             for await (const fragment of chatResponse.text) {
                 stream.markdown(fragment);
             }
         }
     }
-    
+
     return {
         metadata: {
             command: commands.DOCS,

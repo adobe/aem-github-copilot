@@ -1,23 +1,19 @@
 import * as vscode from "vscode";
 import { AEM_COMMANDS as commands } from "../aem.commands";
 import {
-  AEM_BLOCK_COLLECTION_URL,
   PROCESS_COPILOT_CREATE_CMD,
+  PROCESS_COPILOT_CREATE_CMD_TITLE,
 } from "../constants";
-import { getBlockContent, getBlocksList, getEDSContent } from "../utils";
+import { getBlockContent, getBlocksList } from "../utils/helpers";
 
 export async function fetchBlock(
   request: vscode.ChatRequest,
   stream: vscode.ChatResponseStream,
   token: vscode.CancellationToken,
   context: vscode.ExtensionContext
-) {
-  const blockName = request.prompt.trim().toLowerCase();
-  stream.progress(vscode.l10n.t("Fetching Blocks From Block Collection ...🤔"));
-  let metadata = {
-    command: commands.COLLECION,
-  }
-
+): Promise<{ metadata: { command: string } }> {
+  
+  const blockName = request.prompt?.trim().toLowerCase();
   let blockList = await getBlocksList(context);
 
   if (blockName === "ls" || !blockList?.includes(blockName)) {
@@ -25,21 +21,25 @@ export async function fetchBlock(
       `List of available blocks: \n\n  - ${blockList?.join("\n - ")}` :
       `Block not found in collection \n here is the list of available blocks: \n\n  - ${blockList?.join("\n - ")}`;
     stream.markdown(vscode.l10n.t(message));
-    return metadata;
+  } else {
+
+    try {
+      const files = await fetchAEMBlock(blockName, stream);
+      stream.button({
+        command: PROCESS_COPILOT_CREATE_CMD,
+        title: vscode.l10n.t(PROCESS_COPILOT_CREATE_CMD_TITLE),
+        arguments: [files],
+      });
+    } catch (error) {
+      stream.markdown(vscode.l10n.t(`Error fetching block:`));
+    }
   }
 
-  try {
-    const files = await fetchAEMBlock(blockName, stream);
-    stream.button({
-      command: PROCESS_COPILOT_CREATE_CMD,
-      title: vscode.l10n.t(PROCESS_COPILOT_CREATE_CMD),
-      arguments: [files],
-    });
-  } catch (error) {
-    stream.markdown(`Error fetching block:`);
-  }
-
-  return metadata;
+  return {
+    metadata: {
+      command: commands.COLLECION,
+    },
+  };
 }
 
 
@@ -55,12 +55,12 @@ function getFiles(children: any[], blockContentJsonNew: any[], stream: vscode.Ch
   }
 }
 
-function buildFileTree(element: { type: string, name: string, children?: typeof element[] , path: string}, prefix = ''): string {
+function buildFileTree(element: { type: string, name: string, children?: typeof element[], path: string }, prefix = ''): string {
   let fileTreeMd = '';
   if (element.type === 'file') {
-    fileTreeMd +=  prefix + '├──' + element.name;
+    fileTreeMd += prefix + '├──' + element.name;
   } else if (element.type === 'folder') {
-    fileTreeMd +=  prefix + element.name;
+    fileTreeMd += prefix + element.name;
     if (element.children) {
       for (let child of element.children) {
         fileTreeMd += buildFileTree(child, prefix + '    ');
