@@ -50,16 +50,8 @@
     ],
     "commands": [
       {
-        "command": "create",
-        "title": "Create AEM Edge Delivery Services block"
-      },
-      {
-        "command": "info",
-        "title": "Information About AEM Edge Delivery Services blocks"
-      },
-      {
-        "command": "collection",
-        "title": "Pull a block from aem block collection repo"
+        "command": "aem.createFiles",
+        "title": "create files/folders for edge delivery services block"
       }
     ]
   },
@@ -72,8 +64,10 @@
   "devDependencies": {
     "@types/jsdom": "^21.1.6",
     "@types/node": "^20.5.9",
+    "@vscode/prompt-tsx": "^0.2.3-alpha",
     "@types/vscode": "1.90.0",
     "eslint": "^7.22.0",
+    "run-script-os": "^1.1.6",
     "tslint": "^6.1.3",
     "typescript": "^4.0.3"
   },

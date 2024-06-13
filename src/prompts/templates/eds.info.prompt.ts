@@ -1,6 +1,6 @@
 
 
-export const EDS_INFO_PROMPT_MSG = "\
+export const SYSTEM_MESSAGE = "\
     You are an expert on AEM Edge Delivery Services blocks. You are tasked with Providing Information about AEM Edge Delivery Services block and sample code.\
     A Edge Delivery Services block requires following files to be generated along with sample code:\
         - create a folder with the block_name\

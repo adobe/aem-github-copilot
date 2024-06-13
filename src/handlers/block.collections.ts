@@ -1,10 +1,9 @@
 import * as vscode from "vscode";
 import { AEM_COMMANDS as commands } from "../aem.commands";
 import {
-  AEM_BLOCK_COLLECTION_URL,
   PROCESS_COPILOT_CREATE_CMD,
 } from "../constants";
-import { getBlockContent, getBlocksList, getEDSContent } from "../utils";
+import { getBlockContent, getBlocksList, getEDSContent } from "../utils/helpers";
 
 export async function fetchBlock(
   request: vscode.ChatRequest,
@@ -55,12 +54,12 @@ function getFiles(children: any[], blockContentJsonNew: any[], stream: vscode.Ch
   }
 }
 
-function buildFileTree(element: { type: string, name: string, children?: typeof element[] , path: string}, prefix = ''): string {
+function buildFileTree(element: { type: string, name: string, children?: typeof element[], path: string }, prefix = ''): string {
   let fileTreeMd = '';
   if (element.type === 'file') {
-    fileTreeMd +=  prefix + '├──' + element.name;
+    fileTreeMd += prefix + '├──' + element.name;
   } else if (element.type === 'folder') {
-    fileTreeMd +=  prefix + element.name;
+    fileTreeMd += prefix + element.name;
     if (element.children) {
       for (let child of element.children) {
         fileTreeMd += buildFileTree(child, prefix + '    ');
