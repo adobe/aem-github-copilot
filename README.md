@@ -31,7 +31,7 @@ This extension integrates the power of GitHub Copilot's GenAI capabilities into 
 
 > [!IMPORTANT]  
 > In order for this feature to work you need to meet the following requirements:
-> - Use the [Visual Studio Code Insiders](https://code.visualstudio.com/insiders/) release
+> - Use the [Visual Studio Code Insiders](https://code.visualstudio.com/insiders/) release, if already installed then update that.
 > - Use the pre-release version of the [GitHub Copilot Chat](https://marketplace.visualstudio.com/items?itemName=GitHub.copilot-chat) extension
 > - Use pre-release of [AEM Copilot ](https://marketplace.visualstudio.com/items?itemName=neerajgrg93.aem-copilot)
 
