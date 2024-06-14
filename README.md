@@ -2,7 +2,9 @@
 
 ![Visual Studio Marketplace Version](https://img.shields.io/visual-studio-marketplace/v/neerajgrg93.aem-copilot?style=for-the-badge&logo=visual-studio-code&color=blue)
 ![Visual Studio Marketplace Installs](https://img.shields.io/visual-studio-marketplace/i/neerajgrg93.aem-copilot?style=for-the-badge&logo=microsoft&logoColor=green)
+![Visual Studio Marketplace Rating](https://img.shields.io/visual-studio-marketplace/stars/neerajgrg93.aem-copilot?style=for-the-badge&label=RATING&color=%2320b2aa)
 ![GitHub License](https://img.shields.io/github/license/adobe/aem-github-copilot?style=for-the-badge&color=%23008080)
+
 
 
 
