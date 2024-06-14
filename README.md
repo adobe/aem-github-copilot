@@ -18,9 +18,9 @@ This extension integrates the power of GitHub Copilot's GenAI capabilities into 
   
 - **Collection**: Access standard blocks from the AEM block collection directly, eliminating the need to copy and paste blocks from the block-collection repository and increase the adoption of standard blocks.
   
-- **Info Feature**: This feature allows you to retrieve detailed information related to block development within the AEM Edge Delivery Services. It's designed to provide quick access to relevant data, enhancing your understanding and efficiency in block development.
+- **Info**: This feature allows you to retrieve detailed information related to block development within the AEM Edge Delivery Services. It's designed to provide quick access to relevant data, enhancing your understanding and efficiency in block development.
 
-- **Docs Feature**: This feature provides a comprehensive search functionality through the aem.live documentation. It's specifically tailored to help you find any information related to Edge Delivery Services swiftly and accurately. This aims to minimize the time spent on searching for specific documentation, thereby increasing your productivity.
+- **Docs**: This feature provides a comprehensive search functionality through the aem.live documentation. It's specifically tailored to help you find any information related to Edge Delivery Services swiftly and accurately. This aims to minimize the time spent on searching for specific documentation, thereby increasing your productivity.
 
 ## Demo
 
