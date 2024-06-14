@@ -57,6 +57,7 @@
   },
   "main": "./out/extension.js",
   "scripts": {
+    "build": "npm run vscode:prepublish",
     "vscode:prepublish": "npm run compile",
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./"
