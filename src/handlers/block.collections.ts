@@ -80,7 +80,7 @@ async function fetchAEMBlock(
   stream.markdown(`The folder/file structure is as follows:\n`);
   let fileTreeMd = `
   ${blockName}
-  `
+  `;
   for (let element of blockContentJson.children) {
     fileTreeMd += buildFileTree(element);
     fileTreeMd += '\n  ';

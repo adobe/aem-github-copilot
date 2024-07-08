@@ -31,11 +31,11 @@ export function activate(context: vscode.ExtensionContext) {
     let cmdResult: any;
     stream.progress(vscode.l10n.t(getRandomGreeting()));
     try {
-      if (request.command == commands.INFO) {
+      if (request.command === commands.INFO) {
         cmdResult = await infoCmdHandler(request, stream, token);
-      } else if (request.command == commands.CREATE) {
+      } else if (request.command === commands.CREATE) {
         cmdResult = await createCmdHandler(request, stream, token);
-      } else if (request.command == commands.COLLECION) {
+      } else if (request.command === commands.COLLECION) {
         cmdResult = await fetchBlock(request, stream, token, context);
       } else {
         cmdResult = await handleDocsCommand(request, stream, token);

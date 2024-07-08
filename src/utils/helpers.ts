@@ -114,7 +114,7 @@ export async function getBlocksList(context: vscode.ExtensionContext): Promise<s
   let blocks: string[] = [];
   try {
     blocks = context.globalState.get("blocks") || [];
-    if (blocks.length == 0) {
+    if (blocks.length === 0) {
       const { folders } = await getEDSContent("blocks/");
       blocks = folders;
       context.globalState.update("blocks", blocks);
@@ -168,7 +168,7 @@ export async function getBlockContent(blockName: string) {
     name: blockName,
     children: []
   };
-  await recursiveEDSContent(parentObj, parentObj.path)
+  await recursiveEDSContent(parentObj, parentObj.path);
   return parentObj;
 }
 export async function getFileContent(filePath: string) {
@@ -250,5 +250,5 @@ export async function getChatResponse<T extends PromptElementCtor<P, any>, P ext
 }
 
 export const getRandomGreeting = () => {
-    return GREETINGS[Math.floor(Math.random() * GREETINGS.length)];
-}
+  return GREETINGS[Math.floor(Math.random() * GREETINGS.length)];
+};

@@ -12,7 +12,24 @@ let INDEX: any[];
 function poorMansNormalize(text: string): string[] {
     const s = text.toLowerCase().replace(/[^a-z0-9]/g, ' ');
     // filter common fill words like a, the, etc.
-    const words = s.split(' ').filter((word) => word.length > 2).filter((word) => word != 'the' && word != 'and' && word != 'for' && word != 'with' && word != 'from' && word != 'that' && word != 'this' && word != 'which' && word != 'what' && word != 'how' && word != 'why' && word != 'when' && word != 'where' && word != 'who' && word != 'whom' && word != 'whose' && word != 'will' && word != 'would' && word != 'should' && word != 'could' && word != 'can' && word != 'may' && word != 'might' && word != 'shall' && word != 'must' && word != 'have' && word != 'has' && word != 'had' && word != 'do' && word != 'does' && word != 'did' && word != 'is' && word != 'are' && word != 'was' && word != 'were' && word != 'be' && word != 'been' && word != 'being' && word != 'it' && word != 'its' && word != 'they' && word != 'them' && word != 'their' && word != 'our' && word != 'we' && word != 'us' && word != 'you' && word != 'your' && word != 'my' && word != 'mine' && word != 'his' && word != 'her' && word != 'he' && word != 'she' && word != 'it' && word != 'its' && word != 'him' && word != 'her' && word != 'his' && word != 'hers' && word != 'they' && word != 'them' && word != 'their' && word != 'theirs' && word != 'we' && word != 'us' && word != 'our' && word != 'ours' && word != 'you' && word != 'your' && word != 'yours' && word != 'my' && word != 'mine' && word != 'our' && word != 'ours' && word != 'your' && word != 'yours' && word != 'my' && word != 'mine' && word != 'his' && word != 'her' && word != 'he' && word != 'she');
+    const words = s.split(' ')
+        .filter((word) => word.length > 2)
+        .filter((word) => word !== 'the' && word !== 'and' && word !== 'for' && word !== 'with' && word !== 'from'
+            && word !== 'that' && word !== 'this' && word !== 'which' && word !== 'what' && word !== 'how'
+            && word !== 'why' && word !== 'when' && word !== 'where' && word !== 'who' && word !== 'whom'
+            && word !== 'whose' && word !== 'will' && word !== 'would' && word !== 'should' && word !== 'could'
+            && word !== 'can' && word !== 'may' && word !== 'might' && word !== 'shall' && word !== 'must'
+            && word !== 'have' && word !== 'has' && word !== 'had' && word !== 'do' && word !== 'does' && word !== 'did'
+            && word !== 'is' && word !== 'are' && word !== 'was' && word !== 'were' && word !== 'be' && word !== 'been'
+            && word !== 'being' && word !== 'it' && word !== 'its' && word !== 'they' && word !== 'them'
+            && word !== 'their' && word !== 'our' && word !== 'we' && word !== 'us' && word !== 'you'
+            && word !== 'your' && word !== 'my' && word !== 'mine' && word !== 'his' && word !== 'her'
+            && word !== 'he' && word !== 'she' && word !== 'it' && word !== 'its' && word !== 'him' && word !== 'her'
+            && word !== 'his' && word !== 'hers' && word !== 'they' && word !== 'them' && word !== 'their'
+            && word !== 'theirs' && word !== 'we' && word !== 'us' && word !== 'our' && word !== 'ours'
+            && word !== 'you' && word !== 'your' && word !== 'yours' && word !== 'my' && word !== 'mine'
+            && word !== 'our' && word !== 'ours' && word !== 'your' && word !== 'yours' && word !== 'my'
+            && word !== 'mine' && word !== 'his' && word !== 'her' && word !== 'he' && word !== 'she');
     return words.map((e) => e.trim()).filter((e) => !!e);
 }
 
@@ -71,7 +88,7 @@ export async function handleDocsCommand(
                 userQuery: request.prompt,
                 hits: JSON.stringify(hits),
             };
-            const chatResponse = await getChatResponse(DocsPrompt, promptProps, token)
+            const chatResponse = await getChatResponse(DocsPrompt, promptProps, token);
             for await (const fragment of chatResponse.text) {
                 stream.markdown(fragment);
             }
