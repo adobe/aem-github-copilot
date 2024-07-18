@@ -3,8 +3,8 @@ import { AEM_BLOCK_COLLECTION_URL, GREETINGS, MODEL_SELECTOR } from "../constant
 
 import { JSDOM } from 'jsdom';
 import { PromptElementCtor, renderPrompt } from "@vscode/prompt-tsx";
-import { PromptProps } from "../interfaces/promptInterfaces";
-import { File } from "../interfaces/fileinterface";
+import { PromptProps } from "../interfaces/prompt.Interfaces";
+import { File } from "../interfaces/file.interfaces";
 
 /**
  * Parses a string into a JSON object containing file information using regular expressions,

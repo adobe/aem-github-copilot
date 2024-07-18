@@ -35,6 +35,17 @@
 				"npm: watch-tests"
 			],
 			"problemMatcher": []
+		},
+		{
+			"label": "webpack: watch",
+			"type": "shell",
+			"command": "npm",
+			"args": [
+				"run",
+				"watch"
+			], // Assuming you have a "watch" script in your package.json
+			"isBackground": true,
+			"problemMatcher": "$tsc-watch"
 		}
 	]
 }

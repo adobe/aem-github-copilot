@@ -27,3 +27,10 @@ export interface DocsPromptProps extends PromptProps {
 export interface CreatePromptState {
     projectStyleCSS: string;
 }
+
+/**
+ * Prompt state for the issues manage prompt
+ */
+export interface IssuesManagePromptProps extends PromptProps {
+    issueDetails: string;
+}

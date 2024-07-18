@@ -2,7 +2,7 @@ import * as vscode from "vscode";
 import { AEM_COMMANDS as commands } from "../aem.commands";
 import { AEMInfoPrompt } from "../prompts/eds.info.prompt";
 import { getChatResponse } from "../utils/helpers";
-import { PromptProps } from "../interfaces/promptInterfaces";
+import { PromptProps } from "../interfaces/prompt.Interfaces";
 
 export async function infoCmdHandler(
   request: vscode.ChatRequest,

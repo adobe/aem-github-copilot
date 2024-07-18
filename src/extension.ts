@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import { AEM_COMMANDS as commands } from "./aem.commands";
+import { AEM_COMMANDS, AEM_COMMANDS as commands } from "./aem.commands";
 import {
   createCmdHandler,
 } from "./handlers/block.create";
@@ -8,11 +8,13 @@ import { handleDocsCommand } from "./handlers/block.docs";
 
 import {
   AEM_COMMAND_ID,
+  FETCH_ISSUE_DETAIL_CMD,
   PROCESS_COPILOT_CREATE_CMD,
 } from "./constants";
 import { createFolderAndFiles } from "./utils/fileHandler";
 import { fetchBlock } from "./handlers/block.collections";
 import { getRandomGreeting } from "./utils/helpers";
+import { handleIssueManagement } from "./handlers/issueManagement.handler";
 
 interface IAemChatResult extends vscode.ChatResult {
   metadata: {
@@ -37,6 +39,8 @@ export function activate(context: vscode.ExtensionContext) {
         cmdResult = await createCmdHandler(request, stream, token);
       } else if (request.command === commands.COLLECION) {
         cmdResult = await fetchBlock(request, stream, token, context);
+      } else if (request.command === commands.ISSUES) {
+        cmdResult = await handleIssueManagement(request, stream, token);
       } else {
         cmdResult = await handleDocsCommand(request, stream, token);
       }
@@ -44,7 +48,11 @@ export function activate(context: vscode.ExtensionContext) {
       handleError(err, stream);
     }
 
-    return cmdResult.metadata;
+    return {
+      metadata: {
+        command: request.command || "",
+      },
+    };
   };
 
   const aem = vscode.chat.createChatParticipant(AEM_COMMAND_ID, handler);
@@ -76,6 +84,9 @@ export function activate(context: vscode.ExtensionContext) {
         await createFolderAndFiles(filesToCreate);
       }
     ),
+    vscode.commands.registerCommand(FETCH_ISSUE_DETAIL_CMD, async (githubIssue) => {
+      vscode.commands.executeCommand(`workbench.action.chat.open`, `@${AEM_COMMAND_ID} /${commands.ISSUES} fetch me details of issue #${githubIssue.number}`);
+    })
   );
 }
 
