@@ -29,9 +29,3 @@ This extension integrates the power of GitHub Copilot's GenAI capabilities into 
 ![demo](https://raw.githubusercontent.com/adobe/aem-github-copilot/main/resources/demo.png)
 
 
-
-
-Please enter the block name you want to fetch \n\n Example: >@aem /collection block-name
-
-
-
