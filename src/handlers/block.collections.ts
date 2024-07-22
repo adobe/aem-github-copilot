@@ -21,6 +21,7 @@ export async function fetchBlock(
       `List of available blocks: \n\n  - ${blockList?.join("\n - ")}` :
       `Block not found in collection \n here is the list of available blocks: \n\n  - ${blockList?.join("\n - ")}`;
     stream.markdown(vscode.l10n.t(message));
+    stream.markdown(vscode.l10n.t(`\n\nPlease enter the block name you want to fetch \n\n >***@aem /collection block-name***`));
   } else {
 
     try {

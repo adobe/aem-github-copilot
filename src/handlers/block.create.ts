@@ -15,7 +15,7 @@ export async function createCmdHandler(
   const promptProps = {
     userQuery: request.prompt,
   };
-  const chatResponse = await getChatResponse(CreateBlockPrompt, promptProps, token, );
+  const chatResponse = await getChatResponse(CreateBlockPrompt, promptProps, token);
   let resultJsonStr = "";
   for await (const fragment of chatResponse.text) {
     resultJsonStr += fragment;

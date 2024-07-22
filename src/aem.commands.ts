@@ -4,4 +4,5 @@ export enum AEM_COMMANDS {
     // ENHANCE = "enhance", //TODO
     COLLECION = "collection",
     DOCS = "docs",
+    ISSUES = "issues",
 }

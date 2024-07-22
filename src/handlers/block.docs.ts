@@ -3,7 +3,7 @@ import { AEM_COMMANDS as commands } from "../aem.commands";
 import { MODEL_SELECTOR } from '../constants';
 import { DocsPrompt } from '../prompts/block.docs';
 import { getChatResponse } from '../utils/helpers';
-import { DocsPromptProps } from '../interfaces/promptInterfaces';
+import { DocsPromptProps } from '../interfaces/prompt.Interfaces';
 
 const INDEX_URL: string = "https://www.aem.live/docpages-index.json";
 

@@ -4,8 +4,8 @@ import {
   UserMessage,
 } from '@vscode/prompt-tsx';
 
-import * as prompts from "./templates/eds.info.prompt";
-import { PromptProps } from '../interfaces/promptInterfaces';
+import * as prompts from "./templates/eds.info";
+import { PromptProps } from '../interfaces/prompt.Interfaces';
 
 export class AEMInfoPrompt extends PromptElement<PromptProps, any> {
 

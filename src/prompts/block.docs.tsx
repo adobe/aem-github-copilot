@@ -5,7 +5,7 @@ import {
 } from '@vscode/prompt-tsx';
 
 import * as prompts from "./templates/default";
-import { DocsPromptProps } from '../interfaces/promptInterfaces';
+import { DocsPromptProps } from '../interfaces/prompt.Interfaces';
 
 export class DocsPrompt extends PromptElement<DocsPromptProps, any> {
 

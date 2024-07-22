@@ -7,7 +7,7 @@ import {
 
 import * as prompts from "./templates/create.block";
 import { getProjectLevelStyles } from '../utils/helpers';
-import { CreatePromptState, PromptProps } from '../interfaces/promptInterfaces';
+import { CreatePromptState, PromptProps } from '../interfaces/prompt.Interfaces';
 
 export class CreateBlockPrompt extends PromptElement<PromptProps, CreatePromptState> {
 
