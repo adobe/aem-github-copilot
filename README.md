@@ -22,9 +22,16 @@ This extension integrates the power of GitHub Copilot's GenAI capabilities into 
 
 - **Docs**: This feature provides a comprehensive search functionality through the aem.live documentation. It's specifically tailored to help you find any information related to Edge Delivery Services swiftly and accurately. This aims to minimize the time spent on searching for specific documentation, thereby increasing your productivity.
 
+- **Issues**: Get detailed descriptions of GitHub issues for your project, along with Copilot's suggestions for resolutions and improvements. This feature enables a more interactive and guided approach to issue resolution, leveraging AI to suggest potential fixes and optimizations.
+
 ## Demo
 
 ![demo](https://raw.githubusercontent.com/adobe/aem-github-copilot/main/resources/demo.png)
+
+
+
+
+Please enter the block name you want to fetch \n\n Example: >@aem /collection block-name
 
 
 
