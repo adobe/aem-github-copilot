@@ -1,5 +1,11 @@
 import * as vscode from 'vscode';
 
+enum LANGUAGE_MODEL_ID {
+    GPT_3 = "gpt-3.5-turbo",
+    GPT_4 = "gpt-4",
+    GPT_4o = "gpt-4o"
+}
+
 // AEM Constants
 export const AEM_COMMAND_ID = "aem";
 export const PROCESS_COPILOT_CREATE_CMD = "aem.createFiles";
@@ -15,8 +21,8 @@ export const AEM_BLOCK_COLLECTION_URL = `https://cdn.jsdelivr.net/gh/${OWNER}/${
 
 // Github Copilot Model details
 export const MODEL_VENDOR: string = "copilot";
-export const LANGUAGE_MODEL_ID: string = "gpt-3.5-turbo"; // Use faster model. Alternative is 'gpt-4', which is slower but more powerful
-export const MODEL_SELECTOR: vscode.LanguageModelChatSelector = { vendor: MODEL_VENDOR, family: LANGUAGE_MODEL_ID };
+
+export const MODEL_SELECTOR: vscode.LanguageModelChatSelector = { vendor: MODEL_VENDOR, family: LANGUAGE_MODEL_ID.GPT_4o };
 
 // Issue Management Constants
 export const FETCH_ISSUE_DETAIL_CMD = "Fetch Issue Details Command";
