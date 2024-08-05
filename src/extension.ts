@@ -35,17 +35,21 @@ export function activate(context: vscode.ExtensionContext) {
     try {
       if (request.command === commands.INFO) {
         cmdResult = await infoCmdHandler(request, stream, token);
+        logger.logUsage('request', { kind: commands.INFO });
       } else if (request.command === commands.CREATE) {
         cmdResult = await createCmdHandler(request, stream, token);
+        logger.logUsage('request', { kind: commands.CREATE });
       } else if (request.command === commands.COLLECION) {
         cmdResult = await fetchBlock(request, stream, token, context);
+        logger.logUsage('request', { kind: commands.COLLECION });
       } else if (request.command === commands.ISSUES) {
         cmdResult = await handleIssueManagement(request, stream, token);
+        logger.logUsage('request', { kind: commands.ISSUES });
       } else {
         cmdResult = await handleDocsCommand(request, stream, token);
       }
     } catch (err) {
-      handleError(err, stream);
+      handleError(logger, err, stream);
     }
 
     return {
@@ -76,6 +80,28 @@ export function activate(context: vscode.ExtensionContext) {
     },
   };
 
+  const logger = vscode.env.createTelemetryLogger({
+    sendEventData(eventName, data) {
+      // Capture event telemetry
+      console.log(`Event: ${eventName}`);
+      console.log(`Data: ${JSON.stringify(data)}`);
+    },
+    sendErrorData(error, data) {
+      // Capture error telemetry
+      console.error(`Error: ${error}`);
+      console.error(`Data: ${JSON.stringify(data)}`);
+    }
+  });
+
+
+  context.subscriptions.push(aem.onDidReceiveFeedback((feedback: vscode.ChatResultFeedback) => {
+    // Log chat result feedback to be able to compute the success matric of the participant
+    // unhelpful / totalRequests is a good success metric
+    logger.logUsage('chatResultFeedback', {
+      kind: feedback.kind
+    });
+  }));
+
   context.subscriptions.push(
     aem,
     vscode.commands.registerCommand(
@@ -91,11 +117,17 @@ export function activate(context: vscode.ExtensionContext) {
 }
 
 
-function handleError(err: any, stream: vscode.ChatResponseStream): void {
+
+
+function handleError(logger: vscode.TelemetryLogger, err: any, stream: vscode.ChatResponseStream): void {
   // making the chat request might fail because
   // - model does not exist
   // - user consent not given
   // - quote limits exceeded
+  if (logger.isErrorsEnabled) {
+    logger.logError(err);
+  }
+
   if (err instanceof vscode.LanguageModelError) {
     console.log(err.message, err.code, err.cause);
     if (err.cause instanceof Error && err.cause.message.includes('off_topic')) {
