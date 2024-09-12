@@ -30,6 +30,20 @@
 				"${workspaceFolder}/dist/**/*.js"
 			],
 			"preLaunchTask": "tasks: watch-tests"
+		},
+		{
+			"name": "Debug Jest Tests",
+			"type": "node",
+			"request": "launch",
+			"program": "${workspaceFolder}/node_modules/.bin/jest",
+			"args": [
+				"--runInBand"
+			],
+			"console": "integratedTerminal",
+			"internalConsoleOptions": "neverOpen",
+			"skipFiles": [
+				"<node_internals>/**"
+			]
 		}
 	]
 }

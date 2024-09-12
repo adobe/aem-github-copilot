@@ -22,7 +22,7 @@ export const AEM_BLOCK_COLLECTION_URL = `https://cdn.jsdelivr.net/gh/${OWNER}/${
 // Github Copilot Model details
 export const MODEL_VENDOR: string = "copilot";
 
-export const MODEL_SELECTOR: vscode.LanguageModelChatSelector = { vendor: MODEL_VENDOR, family: LANGUAGE_MODEL_ID.GPT_4o };
+export const MODEL_SELECTOR: vscode.LanguageModelChatSelector = { vendor: MODEL_VENDOR, family: LANGUAGE_MODEL_ID.GPT_3 };
 
 // Issue Management Constants
 export const FETCH_ISSUE_DETAIL_CMD = "Fetch Issue Details Command";
