@@ -8,7 +8,7 @@
     "type": "git",
     "url": "https://github.com/adobe/aem-github-copilot"
   },
-  "version": "0.0.5",
+  "version": "0.0.6",
   "engines": {
     "vscode": "^1.92.0"
   },
@@ -32,12 +32,7 @@
           {
             "name": "create",
             "description": "Given a block name, create corresponding files"
-          },
-          {
-            "name": "info",
-            "description": "Information About AEM Edge Delivery Services blocks"
-          },
-          {
+          },{
             "name": "collection",
             "description": "Pull a block from aem block collection repo"
           },
@@ -80,7 +75,7 @@
     "@types/vscode": "1.90.0",
     "@typescript-eslint/eslint-plugin": "^7.16.1",
     "@typescript-eslint/parser": "^7.16.1",
-    "@vscode/prompt-tsx": "^0.2.3-alpha",
+    "@vscode/prompt-tsx": "^0.2.9-alpha",
     "@vscode/test-cli": "^0.0.9",
     "@vscode/test-electron": "^2.4.0",
     "eslint": "^8.57.0",
