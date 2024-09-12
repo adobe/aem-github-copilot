@@ -1,9 +1,8 @@
 import * as vscode from "vscode";
-import { AEM_COMMANDS, AEM_COMMANDS as commands } from "./aem.commands";
+import { AEM_COMMANDS as commands } from "./aem.commands";
 import {
   createCmdHandler,
 } from "./handlers/block.create";
-import { infoCmdHandler } from "./handlers/block.info";
 import { handleDocsCommand } from "./handlers/block.docs";
 
 import {
@@ -33,10 +32,7 @@ export function activate(context: vscode.ExtensionContext) {
     let cmdResult: any;
     stream.progress(vscode.l10n.t(getRandomGreeting()));
     try {
-      if (request.command === commands.INFO) {
-        cmdResult = await infoCmdHandler(request, stream, token);
-        logger.logUsage('request', { kind: commands.INFO });
-      } else if (request.command === commands.CREATE) {
+      if (request.command === commands.CREATE) {
         cmdResult = await createCmdHandler(request, stream, token);
         logger.logUsage('request', { kind: commands.CREATE });
       } else if (request.command === commands.COLLECION) {
@@ -74,7 +70,7 @@ export function activate(context: vscode.ExtensionContext) {
         {
           prompt: "How to build AEM blocks?",
           label: vscode.l10n.t("Build with AEM"),
-          command: commands.INFO,
+          command: commands.DOCS,
         } satisfies vscode.ChatFollowup,
       ];
     },
