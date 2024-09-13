@@ -24,6 +24,9 @@ This extension integrates the power of GitHub Copilot's GenAI capabilities into 
 
 ## Demo
 
-![demo](https://raw.githubusercontent.com/adobe/aem-github-copilot/main/resources/demo.png)
+
+https://github.com/user-attachments/assets/9334f2bc-6977-42d1-abb4-92bf61490475
+
+
 
 
