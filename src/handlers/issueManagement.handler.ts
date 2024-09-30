@@ -1,43 +1,11 @@
 import * as vscode from "vscode";
 import { AEM_COMMANDS as commands } from "../aem.commands";
 import { Comment, Issue } from "../interfaces/issueManagement.interfaces";
-import { fetchAllIssues, fetchIssueDetailsByNumber, fetchLatestIssueDetails, getGitHubClient } from "../utils/github.helper";
+import { extractRepoDetailsFromWorkspace, fetchAllIssues, fetchIssueDetailsByNumber, fetchLatestIssueDetails, getGitHubClient } from "../utils/github.helper";
 import { FETCH_ISSUE_DETAIL_CMD } from "../constants";
 import { IssuesManagePrompt } from "../prompts/issueManagement.prompt";
 import { IssuesManagePromptProps } from "../interfaces/prompt.Interfaces";
 import { getChatResponse } from "../utils/helpers";
-
-// Extracts owner and repo name from the workspace's Git configuration
-async function extractRepoDetailsFromWorkspace(): Promise<{ owner: string; repoName: string } | null> {
-    const gitExtension = vscode.extensions.getExtension('vscode.git')?.exports;
-    if (!gitExtension) {
-        vscode.window.showErrorMessage('Unable to load Git extension');
-        return null;
-    }
-
-    const api = gitExtension.getAPI(1);
-    if (api.repositories.length === 0) {
-        vscode.window.showInformationMessage('No Git repositories found');
-        return null;
-    }
-
-    const repo = api.repositories[0];
-    const remotes = repo.state.remotes;
-    if (remotes.length === 0) {
-        vscode.window.showInformationMessage('No remotes found');
-        return null;
-    }
-
-    const remoteUrl = remotes[0].fetchUrl;
-    const match = remoteUrl?.match(/github\.com[:/](.+?)\/(.+?)(?:\.git)?$/);
-    if (!match) {
-        vscode.window.showErrorMessage('Unable to parse GitHub repository URL');
-        return null;
-    }
-
-    return { owner: match[1], repoName: match[2] };
-}
-
 
 function streamIssueDetails(
     stream: vscode.ChatResponseStream,
@@ -90,7 +58,7 @@ export async function handleIssueManagement(request: vscode.ChatRequest, stream:
         issueDetails: "",
     };
 
-    const octokit = await getGitHubClient();
+    const octokit = await getGitHubClient(workspaceDetails.baseUrl, workspaceDetails.provider);
 
     // Determine action based on user query
     if (userQuery.includes("latest issue")) {
