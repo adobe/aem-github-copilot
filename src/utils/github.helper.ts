@@ -1,14 +1,57 @@
 import { Octokit } from "@octokit/rest";
 import * as vscode from "vscode";
-import { Comment, Issue } from "../interfaces/issueManagement.interfaces";
+import { Issue } from "../interfaces/issueManagement.interfaces";
 
 
-// Utility function to get GitHub Octokit client
-export async function getGitHubClient(): Promise<Octokit> {
-    const session = await vscode.authentication.getSession("github", ["repo"], { createIfNone: true });
-    return new Octokit({ auth: session.accessToken });
+// Extracts owner and repo name from the workspace's Git configuration
+export async function extractRepoDetailsFromWorkspace(): Promise<{ owner: string; repoName: string, baseUrl: string | undefined, provider: string } | null> {
+    const gitExtension = vscode.extensions.getExtension('vscode.git')?.exports;
+    if (!gitExtension) {
+        vscode.window.showErrorMessage('Unable to load Git extension');
+        return null;
+    }
+
+    const api = gitExtension.getAPI(1);
+    if (api.repositories.length === 0) {
+        vscode.window.showInformationMessage('No Git repositories found');
+        return null;
+    }
+
+    const repo = api.repositories[0];
+    const remotes = repo.state.remotes;
+    if (remotes.length === 0) {
+        vscode.window.showInformationMessage('No remotes found');
+        return null;
+    }
+
+    const remoteUrl = remotes[0].fetchUrl;
+    let match;
+    if (remoteUrl.startsWith('https://')) {
+        match = remoteUrl?.match(/https\:\/\/(.+?)[:/](.+?)\/(.+?)(?:\.git)?$/);
+    } else {
+        match = remoteUrl?.match(/@(.+?)[:/](.+?)\/(.+?)(?:\.git)?$/);
+    }
+    if (!match) {
+        vscode.window.showErrorMessage('Unable to parse GitHub repository URL');
+        return null;
+    }
+    const isGH = match[1] === 'github.com';
+    return {
+        owner: match[2],
+        repoName: match[3],
+        baseUrl: isGH ? undefined : 'https://' + match[1] + '/api/v3',
+        provider: (isGH ? 'github' : 'github-enterprise')
+    };
 }
 
+// Utility function to get GitHub Octokit client
+export async function getGitHubClient(baseUrl: string | undefined, provider: string): Promise<Octokit> {
+    const session = await vscode.authentication.getSession(provider, ["repo"], { createIfNone: true });
+    return new Octokit({
+        auth: session.accessToken,
+        baseUrl
+    });
+}
 
 // Fetches the latest issue details including comments
 export async function fetchLatestIssueDetails(owner: string, repoName: string, octokit: Octokit): Promise< Issue| null> {
