@@ -9,8 +9,10 @@ import { CreateBlockPrompt } from "../prompts/create.block";
 
 export async function createCmdHandler(
   request: vscode.ChatRequest,
+  chatContext: vscode.ChatContext,
   stream: vscode.ChatResponseStream,
-  token: vscode.CancellationToken
+  token: vscode.CancellationToken,
+  extensionContext: vscode.ExtensionContext
 ): Promise<{ metadata: { command: string } }> {
   const promptProps = {
     userQuery: request.prompt,

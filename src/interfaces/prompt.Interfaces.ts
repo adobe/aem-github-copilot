@@ -22,6 +22,15 @@ export interface DocsPromptProps extends PromptProps {
 }
 
 /**
+ * DocsToolPromptProps interface extends PromptProps.
+ * @interface
+ * @property {string} titles - The titles of aem live site
+ */
+export interface DocsToolPromptProps extends PromptProps {
+    titles: string
+}
+
+/**
 * Prompt state for the create prompt
 */
 export interface CreatePromptState {

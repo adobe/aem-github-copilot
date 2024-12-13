@@ -5,6 +5,8 @@ import { JSDOM } from 'jsdom';
 import { PromptElementCtor, renderPrompt } from "@vscode/prompt-tsx";
 import { PromptProps } from "../interfaces/prompt.Interfaces";
 import { File } from "../interfaces/file.interfaces";
+import { CloseIssueTool, CreateIssueTool, FetchIssueDetailsTool, FetchLatestIssueTool } from "../tools/githubtools";
+import { DocsIdentifierTool } from "../tools/docstools";
 
 /**
  * Parses a string into a JSON object containing file information using regular expressions,
@@ -180,7 +182,7 @@ export async function getFileContent(filePath: string) {
 export async function recursiveEDSContent(parentObj: any, folderPath: string) {
   let { folders, files } = await getEDSContent(`${folderPath}/`);
   for (let file of files) {
-    const filePath = parentObj.path + '/'+ file;
+    const filePath = parentObj.path + '/' + file;
     const fileContent = await getFileContent(filePath);
     parentObj.children.push({
       type: 'file',
@@ -191,7 +193,7 @@ export async function recursiveEDSContent(parentObj: any, folderPath: string) {
   }
 
   for (const folder of folders) {
-    const folderPath = parentObj.path + '/'+ folder;
+    const folderPath = parentObj.path + '/' + folder;
     const folderObj = {
       type: 'folder',
       name: folder,
@@ -235,7 +237,7 @@ export async function getProjectLevelStyles(): Promise<string> {
  * 
  * @throws {Error} - Throws an error if no language model is found.
  */
-export async function getChatResponse<T extends PromptElementCtor<P, any>, P extends PromptProps>(prompt:T, promptProps: P, token: vscode.CancellationToken): Promise<Thenable<vscode.LanguageModelChatResponse>> {
+export async function getChatResponse<T extends PromptElementCtor<P, any>, P extends PromptProps>(prompt: T, promptProps: P, token: vscode.CancellationToken): Promise<Thenable<vscode.LanguageModelChatResponse>> {
   const [model] = await vscode.lm.selectChatModels(MODEL_SELECTOR);
   if (model) {
     const { messages } = await renderPrompt(
@@ -252,3 +254,33 @@ export async function getChatResponse<T extends PromptElementCtor<P, any>, P ext
 export const getRandomGreeting = () => {
   return GREETINGS[Math.floor(Math.random() * GREETINGS.length)];
 };
+
+
+export function registerGitHubTools(context: vscode.ExtensionContext) {
+  context.subscriptions.push(vscode.lm.registerTool('aem-github-tools-createIssue', new CreateIssueTool()));
+  context.subscriptions.push(vscode.lm.registerTool('aem-github-tools-closeIssue', new CloseIssueTool()));
+  context.subscriptions.push(vscode.lm.registerTool('aem-github-tools-fetchIssueDetails', new FetchIssueDetailsTool()));
+  context.subscriptions.push(vscode.lm.registerTool('aem-github-tools-fetchLatestIssue', new FetchLatestIssueTool()));
+  context.subscriptions.push(vscode.lm.registerTool('aem-github-tools-docsIdentifier', new DocsIdentifierTool()));
+}
+
+
+export function parseCopilotResponseToJson(responseTxt: string): any {
+  // Extract JSON by removing the code block markers
+  const jsonString = responseTxt.replace(/^\`\`\`json\n/, '').replace(/\n\`\`\`$/, '');
+
+  // Parse the JSON string
+  let jsonData;
+  try {
+    jsonData = JSON.parse(jsonString);
+  } catch (error) {
+    console.error("Failed to parse JSON:", error);
+  }
+
+  // Iterate over the JSON data
+  if (Array.isArray(jsonData)) {
+    return jsonData;
+  } else {
+    return {};
+  }
+}

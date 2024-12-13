@@ -8,9 +8,9 @@
     "type": "git",
     "url": "https://github.com/adobe/aem-github-copilot"
   },
-  "version": "0.0.6",
+  "version": "0.0.7",
   "engines": {
-    "vscode": "^1.92.0"
+    "vscode": "^1.95.0"
   },
   "extensionDependencies": [
     "github.copilot-chat"
@@ -19,6 +19,23 @@
     "AI",
     "Chat"
   ],
+  "keywords": [
+		"chat-participant",
+		"ai",
+		"openai",
+		"anthropic",
+		"gemini",
+		"claude",
+		"vision",
+		"accessibility",
+		"images",
+		"pilot",
+		"co-pilot"
+	],
+  "enabledApiProposals": [
+		"chatReferenceBinaryData",
+		"codeActionAI"
+	],
   "activationEvents": [],
   "contributes": {
     "chatParticipants": [
@@ -43,6 +60,14 @@
           {
             "name": "issues",
             "description": "Issues management for AEM Edge Delivery Services"
+          },
+          {
+            "name": "test",
+            "description": "get github issues details"
+          },
+          {
+            "name": "docsnew",
+            "description": "Information About AEM Edge Delivery Services"
           }
         ]
       }
@@ -51,6 +76,118 @@
       {
         "command": "aem.createFiles",
         "title": "create files/folders for edge delivery services block"
+      }
+    ],
+    "languageModelTools": [
+      { 
+        "name": "github-tools-fetchIssueDetails",
+        "tags": [
+          "editors",
+          "chat-tools-sample"
+        ],
+        "toolReferenceName": "test-github-issues",
+        "displayName": "Test Github Issues",
+        "modelDescription": "Test Github Issues",
+        "icon": "$(files)",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "issueNumber": {
+              "type": "number",
+              "description": "Github Issue Number",
+              "default": "0"
+            }
+          }
+        }
+      },
+      {
+        "name": "github-tools-createIssue",
+        "tags": [
+          "editors",
+          "chat-tools-sample"
+        ],
+        "toolReferenceName": "create-github-issue",
+        "displayName": "Create Github Issue",
+        "modelDescription": "Create Github Issue",
+        "icon": "$(files)",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "title": {
+              "type": "string",
+              "description": "Issue Title",
+              "default": "New Issue"
+            },
+            "body": {
+              "type": "string",
+              "description": "Issue Body",
+              "default": "Issue Body"
+            }
+          }
+        }
+      },
+      { 
+        "name": "github-tools-closeIssue",
+        "tags": [
+          "editors",
+          "chat-tools-sample"
+        ],
+        "toolReferenceName": "close-github-issue",
+        "displayName": "Close Github Issue",
+        "modelDescription": "Close Github Issue",
+        "icon": "$(files)",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "issueNumber": {
+              "type": "number",
+              "description": "Github Issue Number",
+              "default": "0"
+            }
+          }
+        }
+      },
+      {
+        "name": "github-tools-fetchLatestIssue",
+        "tags": [
+          "editors",
+          "chat-tools-sample"
+        ],
+        "toolReferenceName": "fetch-latest-github-issue",
+        "displayName": "Fetch Latest Github Issue",
+        "modelDescription": "Fetch Latest Github Issue",
+        "icon": "$(files)",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "repo": {
+              "type": "string",
+              "description": "Github Repository",
+              "default": "aem-github-copilot"
+            }
+          }
+        }
+      },
+      {
+        "name": "aem-github-tools-docsIdentifier",
+        "tags": [
+          "editors",
+          "chat-tools-sample"
+        ],
+        "toolReferenceName": "aem-github-tools-docsIdentifier",
+        "displayName": "AEM Edge Delivery Services Docs Identifier",
+        "modelDescription": "AEM Edge Delivery Services Docs Identifier",
+        "icon": "$(files)",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "query": {
+              "type": "string",
+              "description": "User prompt to identify the docs"
+            }
+          },
+          "required": ["query"]
+        }
       }
     ]
   },
@@ -71,11 +208,10 @@
     "@octokit/rest": "^20.1.1",
     "@types/jsdom": "^21.1.6",
     "@types/mocha": "^10.0.6",
-    "@types/node": "^20.5.9",
-    "@types/vscode": "1.90.0",
+    "@types/node": "^20",
+    "@types/vscode": "^1.95.0",
     "@typescript-eslint/eslint-plugin": "^7.16.1",
     "@typescript-eslint/parser": "^7.16.1",
-    "@vscode/prompt-tsx": "^0.2.9-alpha",
     "@vscode/test-cli": "^0.0.9",
     "@vscode/test-electron": "^2.4.0",
     "eslint": "^8.57.0",
@@ -88,6 +224,8 @@
     "simple-git": "^3.24.0"
   },
   "dependencies": {
-    "jsdom": "^24.1.0"
+    "jsdom": "^24.1.0",
+    "@vscode/chat-extension-utils": "^0.0.0-alpha.1",
+    "@vscode/prompt-tsx": "^0.3.0-alpha.12"
   }
 }

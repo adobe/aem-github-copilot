@@ -45,7 +45,13 @@ async function streamCopilotResponse(stream: vscode.ChatResponseStream, issueDet
 }
 
 // Main handler for issue management
-export async function handleIssueManagement(request: vscode.ChatRequest, stream: vscode.ChatResponseStream, token: vscode.CancellationToken): Promise<{ metadata: { command: string } }> {
+export async function handleIssueManagement(
+      request: vscode.ChatRequest,
+      chatContext: vscode.ChatContext,
+      stream: vscode.ChatResponseStream,
+      token: vscode.CancellationToken,
+      extensionContext: vscode.ExtensionContext
+): Promise<{ metadata: { command: string } }> {
     const userQuery = request.prompt.toLowerCase();
     const workspaceDetails = await extractRepoDetailsFromWorkspace();
     if (!workspaceDetails) {

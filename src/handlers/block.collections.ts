@@ -7,14 +7,15 @@ import {
 import { getBlockContent, getBlocksList } from "../utils/helpers";
 
 export async function fetchBlock(
-  request: vscode.ChatRequest,
-  stream: vscode.ChatResponseStream,
-  token: vscode.CancellationToken,
-  context: vscode.ExtensionContext
+   request: vscode.ChatRequest,
+   chatContext: vscode.ChatContext,
+   stream: vscode.ChatResponseStream,
+   token: vscode.CancellationToken,
+   extensionContext: vscode.ExtensionContext
 ): Promise<{ metadata: { command: string } }> {
   
   const blockName = request.prompt?.trim().toLowerCase();
-  let blockList = await getBlocksList(context);
+  let blockList = await getBlocksList(extensionContext);
 
   if (blockName === "ls" || !blockList?.includes(blockName)) {
     const message = blockName === "ls" ?

@@ -1,9 +1,15 @@
 import * as vscode from 'vscode';
 
+
+// supported models are gpt-4o, gpt-4o-mini, o1-preview, o1-mini, claude-3.5-sonnet, gemini-1.5-pro
 enum LANGUAGE_MODEL_ID {
     GPT_3 = "gpt-3.5-turbo",
     GPT_4 = "gpt-4",
-    GPT_4o = "gpt-4o"
+    GPT_4o = "gpt-4o",
+    O1_PREVIEW = "o1-preview",
+    O1_MINI = "o1-mini",
+    CLAUDE_3_5_SONNET = "claude-3.5-sonnet",
+    GEMINI_1_5_PRO = "gemini-1.5-pro"
 }
 
 // AEM Constants
