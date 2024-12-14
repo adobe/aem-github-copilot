@@ -1,44 +1,34 @@
 import vscode from 'vscode';
-import { MODEL_SELECTOR } from '../constants';
-import { ANNOTATION_PROMPT } from '../prompts/templates/annotations';
+import { ANNOTATION_SYSTEM_MESSAGE } from '../prompts/templates/annotations';
+import { AnnotationPrompt } from '../prompts/annotations';
+import { getChatResponse } from '../utils/helpers';
 
 
 export async function annotateTextEditor(textEditor: vscode.TextEditor) {
-    vscode.window.showInformationMessage('Fetching code annotations...');
-
-    // Get the code with line numbers from the current editor
     const codeWithLineNumbers = getVisibleCodeWithLineNumbers(textEditor);
+    const bestPractices = await fetchAEMBestPractices();
 
-    // select the 4o chat model
-    const [model] = await vscode.lm.selectChatModels(MODEL_SELECTOR);
-
-    // init the chat message
-    const messages = [
-        vscode.LanguageModelChatMessage.User(ANNOTATION_PROMPT),
-        vscode.LanguageModelChatMessage.User(codeWithLineNumbers)
-    ];
-
-    // make sure the model is available
-    if (model) {
+    const promptProps = {
+        userQuery: codeWithLineNumbers,
+        bestPractices: bestPractices
+      };
+   
+    try {
         // send the messages array to the model and get the response
         vscode.window.withProgress({
             location: vscode.ProgressLocation.Notification,
             title: 'Fetching code annotations...',
             cancellable: false
         }, async (progress) => {
-            let chatResponse = await model.sendRequest(
-                messages,
-                {},
-                new vscode.CancellationTokenSource().token
-            );
-
+            const chatResponse = await getChatResponse(AnnotationPrompt, promptProps, new vscode.CancellationTokenSource().token);
             // handle chat response
             await parseChatResponse(chatResponse, textEditor);
             vscode.window.showInformationMessage('Code annotations applied successfully!');
         });
-    } else {
+    } catch (error) {
         vscode.window.showErrorMessage('Failed to fetch code annotations.');
     }
+   
 }
 
 function getVisibleCodeWithLineNumbers(textEditor: vscode.TextEditor) {
@@ -98,7 +88,12 @@ function applyDecoration(editor: vscode.TextEditor, line: number, suggestion: st
 
     const commandUri = vscode.Uri.parse(`command:applyCodeSuggestion?${encodeURIComponent(JSON.stringify({ line, suggestion }))}`);
     const decoration = { range: range, hoverMessage: new vscode.MarkdownString(`[Apply Change](${commandUri})`).appendText(` ${suggestion}`) };
-
+        
+    // Apply the decoration to the active text editor
+    const activeEditor = vscode.window.activeTextEditor;
+    if (activeEditor) {
+        activeEditor.setDecorations(decorationType, [decoration]);
+    }
     vscode.window.activeTextEditor?.setDecorations(decorationType, [decoration]);
 
     // Listen for changes in the document and remove the decoration if the line is edited
@@ -124,3 +119,17 @@ vscode.commands.registerCommand('applyCodeSuggestion', async (args: { line: numb
         });
     }
 });
+
+async function fetchAEMBestPractices() {
+    const bestPractices = await vscode.window.withProgress({
+        location: vscode.ProgressLocation.Notification,
+        title: 'Applying AEM best practices...',
+        cancellable: false
+    }, async (progress) => {
+        const response = await fetch('https://www.aem.live/docpages-index.json');
+        const bestPracticesJson = await response.json();
+        const bestPracticesPage = bestPracticesJson.data.find((element: { path: string; }) => element.path === '/docs/dev-collab-and-good-practices');
+        return bestPracticesPage.content;
+    });
+    return bestPractices;
+}

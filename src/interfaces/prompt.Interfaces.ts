@@ -36,3 +36,8 @@ export interface DocsToolPromptProps extends PromptProps {
 export interface CreatePromptState {
     projectStyleCSS: string;
 }
+
+
+export interface AnnotationPromptProps extends PromptProps {
+    bestPractices: string;
+}
