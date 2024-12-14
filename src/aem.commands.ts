@@ -3,5 +3,5 @@ export enum AEM_COMMANDS {
     COLLECION = "collection",
     DOCS = "docs",
     ISSUES = "issues",
-    TEST = "test",
+    VISION = "vision",
 }

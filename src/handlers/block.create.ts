@@ -4,7 +4,7 @@ import {
   PROCESS_COPILOT_CREATE_CMD,
   PROCESS_COPILOT_CREATE_CMD_TITLE,
 } from "../constants";
-import { createBlockMarkdown, getBlockContent, getBlocksList, getChatResponse, parseEDSblockJson } from "../utils/helpers";
+import { createBlockMarkdown, getBlockContent, getBlocksList, getChatResponse, parseCopilotJsonResponse } from "../utils/helpers";
 import { CreateBlockPrompt } from "../prompts/create.block";
 
 export async function createCmdHandler(
@@ -38,7 +38,7 @@ export async function createCmdHandler(
     for await (const fragment of chatResponse.text) {
       resultJsonStr += fragment;
     }
-    const resultJson = parseEDSblockJson(resultJsonStr);
+    const resultJson = parseCopilotJsonResponse(resultJsonStr);
     const blockMd = createBlockMarkdown(resultJson);
 
     stream.markdown(blockMd);

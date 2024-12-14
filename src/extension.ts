@@ -17,6 +17,7 @@ import { getRandomGreeting, registerAemCopilotTools } from "./utils/helpers";
 import { handleIssuesCommand } from "./handlers/github";
 import { handleDocsCommand } from "./handlers/docs";
 import { annotateTextEditor } from "./handlers/annotation";
+import { handleVisionCommand } from "./handlers/vision";
 
 interface IAemChatResult extends vscode.ChatResult {
   metadata: {
@@ -47,6 +48,9 @@ export function activate(extensionContext: vscode.ExtensionContext) {
       } else if (request.command === commands.ISSUES) {
         cmdResult = await handleIssuesCommand(request, chatContext, stream, token, extensionContext);
         logger.logUsage('request', { kind: commands.ISSUES });
+      } else if (request.command === commands.VISION) {
+        cmdResult = await handleVisionCommand(request, chatContext, stream, token, extensionContext);
+        logger.logUsage('request', { kind: commands.VISION });
       } else {
         cmdResult = await handleDocsCommand(request, chatContext, stream, token, extensionContext);
       }

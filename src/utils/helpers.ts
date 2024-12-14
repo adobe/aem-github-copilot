@@ -74,7 +74,7 @@ function getFilePaths(fileTree: string): File[] {
   return result;
 }
 
-export function parseEDSblockJson(resultJson: string) {
+export function parseCopilotJsonResponse(resultJson: string) {
   const cleanStr = resultJson.replace(/```json\n|```/g, "").trim();
   const blockJson = JSON.parse(cleanStr);
   return blockJson;

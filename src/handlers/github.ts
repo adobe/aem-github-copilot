@@ -17,7 +17,7 @@ export async function handleIssuesCommand(
         console.log('Model not found. Please make sure the GitHub Copilot Chat extension is installed and enabled.');
         return {
             metadata: {
-                command: commands.TEST,
+                command: commands.ISSUES,
             },
         };
     }
