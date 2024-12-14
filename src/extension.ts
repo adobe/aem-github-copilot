@@ -11,7 +11,7 @@ import {
 } from "./constants";
 import { createFolderAndFiles } from "./utils/fileHandler";
 import { fetchBlock } from "./handlers/block.collections";
-import { getRandomGreeting, registerGitHubTools } from "./utils/helpers";
+import { getRandomGreeting, registerAemCopilotTools } from "./utils/helpers";
 import { handleIssueManagement } from "./handlers/issueManagement.handler";
 import { handleTestCommand } from "./handlers/test";
 import { handleDocsCommand } from "./handlers/docs";
@@ -24,6 +24,8 @@ interface IAemChatResult extends vscode.ChatResult {
 
 export function activate(extensionContext: vscode.ExtensionContext) {
   // Define a AEM chat handler.
+  registerAemCopilotTools(extensionContext);
+
   const handler: vscode.ChatRequestHandler = async (
     request: vscode.ChatRequest,
     chatContext: vscode.ChatContext,
@@ -31,7 +33,6 @@ export function activate(extensionContext: vscode.ExtensionContext) {
     token: vscode.CancellationToken
   ): Promise<any> => {
     let cmdResult: any;
-    registerGitHubTools(extensionContext);
     stream.progress(vscode.l10n.t(getRandomGreeting()));
 
     try {

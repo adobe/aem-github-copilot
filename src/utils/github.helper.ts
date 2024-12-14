@@ -81,6 +81,9 @@ export async function fetchLatestIssueDetails(owner: string, repoName: string, o
             title: latestIssue.title,
             body: latestIssue.body || '',
             comments: commentsResponse.data,
+            labels: latestIssue?.labels || '',
+            assignees: latestIssue?.assignees || '',
+            milestone: latestIssue?.milestone || '',
         };
     } catch (error) {
         vscode.window.showErrorMessage(`Error fetching issue details: ${error}`);
@@ -106,6 +109,9 @@ export async function fetchIssueDetailsByNumber(owner: string, repoName: string,
             title: issue.data.title,
             body: issue.data.body || '',
             comments: commentsResponse.data,
+            labels: issue.data.labels || '',
+            assignees: issue.data.assignees || '',
+            milestone: issue.data.milestone || '',
         };
     } catch (error) {
         vscode.window.showErrorMessage(`Error fetching issue details: ${error}`);
@@ -129,3 +135,32 @@ export async function fetchAllIssues(owner: string, repoName: string, octokit: O
         return null;
     }
 }
+
+export async function createIssue(owner: string, repoName: string, octokit: Octokit, title: string, body: string): Promise<any> {
+    try {
+        const issue = await octokit.issues.create({
+            owner,
+            repo: repoName,
+            title,
+            body,
+        });
+        vscode.window.showInformationMessage('Issue created successfully');
+        return issue;
+    } catch (error) {
+        vscode.window.showErrorMessage(`Error creating issue: ${error}`);
+    }
+}
+
+export async function closeIssue(owner: string, repoName: string, octokit: Octokit, issueNumber: number): Promise<any> {
+    try {
+        await octokit.issues.update({
+            owner,
+            repo: repoName,
+            issue_number: issueNumber,
+            state: 'closed',
+        });
+        vscode.window.showInformationMessage('Issue closed successfully');
+    } catch (error) {
+        vscode.window.showErrorMessage(`Error closing issue: ${error}`);
+    }
+}   

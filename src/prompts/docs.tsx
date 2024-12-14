@@ -13,7 +13,7 @@ export class DocsToolPrompt extends PromptElement<DocsToolPromptProps, any> {
     return (
       <>
         <UserMessage>{prompts.DOCS_TOOL_SYSTEM_MESSAGE}</UserMessage>
-        <UserMessage>{this.props.titles}</UserMessage>
+        <UserMessage>{this.props.docs}</UserMessage>
         <UserMessage>{this.props.userQuery}</UserMessage>
       </>
     );

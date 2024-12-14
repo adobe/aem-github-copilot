@@ -8,4 +8,7 @@ export interface Issue {
     title: string;
     body: string;
     comments: Comment[];
+    labels: any;
+    assignees: any;
+    milestone: any;
 }

@@ -27,7 +27,7 @@ export interface DocsPromptProps extends PromptProps {
  * @property {string} titles - The titles of aem live site
  */
 export interface DocsToolPromptProps extends PromptProps {
-    titles: string
+    docs: string
 }
 
 /**

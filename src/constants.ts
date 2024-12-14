@@ -45,3 +45,5 @@ export const GREETINGS = [
     "Let's get this sorted... 🗂️",
     "Hang tight, I'm on the case... 🕵️‍♀️"
 ];
+
+export const AEM_COPILOT_TOOLS_PREFIX = "aem_copilot";

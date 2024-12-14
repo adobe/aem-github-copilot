@@ -54,10 +54,6 @@
             "description": "Pull a block from aem block collection repo"
           },
           {
-            "name": "docs",
-            "description": "Information About AEM Edge Delivery Services"
-          },
-          {
             "name": "issues",
             "description": "Issues management for AEM Edge Delivery Services"
           },
@@ -66,7 +62,7 @@
             "description": "get github issues details"
           },
           {
-            "name": "docsnew",
+            "name": "docs",
             "description": "Information About AEM Edge Delivery Services"
           }
         ]
@@ -80,33 +76,35 @@
     ],
     "languageModelTools": [
       { 
-        "name": "github-tools-fetchIssueDetails",
+        "name": "aem_copilot_github_fetchIssueDetails",
         "tags": [
-          "editors",
-          "chat-tools-sample"
+          "github",
+          "get-github-issue",
+          "aem-copilot-tools"
         ],
-        "toolReferenceName": "test-github-issues",
+        "toolReferenceName": "aem_copilot_github_fetchIssueDetails",
         "displayName": "Test Github Issues",
         "modelDescription": "Test Github Issues",
-        "icon": "$(files)",
+        "icon": "$(git-fetch)",
         "inputSchema": {
           "type": "object",
           "properties": {
             "issueNumber": {
               "type": "number",
-              "description": "Github Issue Number",
-              "default": "0"
+              "description": "Github Issue Number"
             }
-          }
+          },
+          "required": ["issueNumber"]
         }
       },
       {
-        "name": "github-tools-createIssue",
+        "name": "aem_copilot_github_createIssue",
         "tags": [
-          "editors",
-          "chat-tools-sample"
+          "github",
+          "create-github-issue",
+          "aem-copilot-tools"
         ],
-        "toolReferenceName": "create-github-issue",
+        "toolReferenceName": "aem_copilot_github_createIssue",
         "displayName": "Create Github Issue",
         "modelDescription": "Create Github Issue",
         "icon": "$(files)",
@@ -123,16 +121,17 @@
               "description": "Issue Body",
               "default": "Issue Body"
             }
-          }
+          },
+          "required": ["title", "body"]
         }
       },
       { 
-        "name": "github-tools-closeIssue",
+        "name": "aem_copilot_github_closeIssue",
         "tags": [
-          "editors",
-          "chat-tools-sample"
+          "github",
+          "aem-copilot-tools"
         ],
-        "toolReferenceName": "close-github-issue",
+        "toolReferenceName": "aem_copilot_github_closeIssue",
         "displayName": "Close Github Issue",
         "modelDescription": "Close Github Issue",
         "icon": "$(files)",
@@ -141,19 +140,19 @@
           "properties": {
             "issueNumber": {
               "type": "number",
-              "description": "Github Issue Number",
-              "default": "0"
+              "description": "Github Issue Number"
             }
-          }
+          },
+          "required": ["issueNumber"]
         }
       },
       {
-        "name": "github-tools-fetchLatestIssue",
+        "name": "aem_copilot_github_fetchLatestIssue",
         "tags": [
-          "editors",
-          "chat-tools-sample"
+          "github",
+          "aem-copilot-tools"
         ],
-        "toolReferenceName": "fetch-latest-github-issue",
+        "toolReferenceName": "aem_copilot_github_fetchLatestIssue",
         "displayName": "Fetch Latest Github Issue",
         "modelDescription": "Fetch Latest Github Issue",
         "icon": "$(files)",
@@ -162,19 +161,46 @@
           "properties": {
             "repo": {
               "type": "string",
-              "description": "Github Repository",
-              "default": "aem-github-copilot"
+              "description": "Github Repository"
             }
-          }
+          },
+          "required": ["repo"]
         }
       },
       {
-        "name": "aem-github-tools-docsIdentifier",
+        "name": "aem_copilot_github_fetchAssignedIssue",
+        "tags": [
+          "github",
+          "aem-copilot-tools"
+        ],
+        "toolReferenceName": "aem_copilot_github_fetchAssignedIssue",
+        "displayName": "Fetch Assigned Github Issue",
+        "modelDescription": "Fetch Assigned Github Issue",
+        "icon": "$(files)",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "repo": {
+              "type": "string",
+              "description": "Github Repository"
+            },
+            "username": {
+              "type": "string",
+              "description": "Github Username"
+            }
+          },
+          "required": [
+            "repo"
+          ]
+        }
+      },
+      {
+        "name": "aem_copilot_docsIdentifier",
         "tags": [
           "editors",
           "chat-tools-sample"
         ],
-        "toolReferenceName": "aem-github-tools-docsIdentifier",
+        "toolReferenceName": "aem_copilot_docsIdentifier",
         "displayName": "AEM Edge Delivery Services Docs Identifier",
         "modelDescription": "AEM Edge Delivery Services Docs Identifier",
         "icon": "$(files)",
@@ -187,6 +213,50 @@
             }
           },
           "required": ["query"]
+        }
+      },
+      {
+        "name": "aem_copilot_runInTerminal",
+        "tags": [
+          "terminal",
+          "aem-copilot-tools"
+        ],
+        "displayName": "Run in Terminal",
+        "modelDescription": "Run a command in a terminal and return the output",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "command": {
+              "type": "string",
+              "description": "The command to run"
+            }
+          },
+          "required": [
+            "command"
+          ]
+        }
+      },
+      {
+        "name": "aem_copilot_findFiles",
+        "tags": [
+          "files",
+          "search",
+          "aem-copilot-tools"
+        ],
+        "displayName": "Find Files",
+        "toolReferenceName": "aem_copilot_findFiles",
+        "modelDescription": "Search for files in the current workspace",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "pattern": {
+              "type": "string",
+              "description": "Search for files that match this glob pattern"
+            }
+          },
+          "required": [
+            "pattern"
+          ]
         }
       }
     ]

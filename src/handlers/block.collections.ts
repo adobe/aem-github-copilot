@@ -24,7 +24,6 @@ export async function fetchBlock(
     stream.markdown(vscode.l10n.t(message));
     stream.markdown(vscode.l10n.t(`\n\nPlease enter the block name you want to fetch \n\n >***@aem /collection block-name***`));
   } else {
-
     try {
       const files = await fetchAEMBlock(blockName, stream);
       stream.button({
@@ -33,7 +32,7 @@ export async function fetchBlock(
         arguments: [files],
       });
     } catch (error) {
-      stream.markdown(vscode.l10n.t(`Error fetching block:`));
+      stream.markdown(vscode.l10n.t(`Error fetching block: ${blockName}`));
     }
   }
 

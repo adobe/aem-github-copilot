@@ -1,12 +1,13 @@
 import * as vscode from "vscode";
-import { AEM_BLOCK_COLLECTION_URL, GREETINGS, MODEL_SELECTOR } from "../constants";
+import { AEM_BLOCK_COLLECTION_URL, AEM_COPILOT_TOOLS_PREFIX, GREETINGS, MODEL_SELECTOR } from "../constants";
 
 import { JSDOM } from 'jsdom';
 import { PromptElementCtor, renderPrompt } from "@vscode/prompt-tsx";
 import { PromptProps } from "../interfaces/prompt.Interfaces";
 import { File } from "../interfaces/file.interfaces";
-import { CloseIssueTool, CreateIssueTool, FetchIssueDetailsTool, FetchLatestIssueTool } from "../tools/githubtools";
+import { CloseIssueTool, CreateIssueTool, FetchAssignedIssuesTool, FetchIssueDetailsTool, FetchLatestIssueTool } from "../tools/githubtools";
 import { DocsIdentifierTool } from "../tools/docstools";
+import { FindFilesTool, RunInTerminalTool } from "../tools/tools";
 
 /**
  * Parses a string into a JSON object containing file information using regular expressions,
@@ -256,14 +257,17 @@ export const getRandomGreeting = () => {
 };
 
 
-export function registerGitHubTools(context: vscode.ExtensionContext) {
-  context.subscriptions.push(vscode.lm.registerTool('aem-github-tools-createIssue', new CreateIssueTool()));
-  context.subscriptions.push(vscode.lm.registerTool('aem-github-tools-closeIssue', new CloseIssueTool()));
-  context.subscriptions.push(vscode.lm.registerTool('aem-github-tools-fetchIssueDetails', new FetchIssueDetailsTool()));
-  context.subscriptions.push(vscode.lm.registerTool('aem-github-tools-fetchLatestIssue', new FetchLatestIssueTool()));
-  context.subscriptions.push(vscode.lm.registerTool('aem-github-tools-docsIdentifier', new DocsIdentifierTool()));
+export function registerAemCopilotTools(context: vscode.ExtensionContext) {
+  context.subscriptions.push(vscode.lm.registerTool(`${AEM_COPILOT_TOOLS_PREFIX}_github_createIssue`, new CreateIssueTool()));
+  context.subscriptions.push(vscode.lm.registerTool(`${AEM_COPILOT_TOOLS_PREFIX}_github_closeIssue`, new CloseIssueTool()));
+  context.subscriptions.push(vscode.lm.registerTool(`${AEM_COPILOT_TOOLS_PREFIX}_github_fetchIssueDetails`, new FetchIssueDetailsTool()));
+  context.subscriptions.push(vscode.lm.registerTool(`${AEM_COPILOT_TOOLS_PREFIX}_github_fetchLatestIssue`, new FetchLatestIssueTool()));
+  context.subscriptions.push(vscode.lm.registerTool(`${AEM_COPILOT_TOOLS_PREFIX}_github_fetchAssignedIssue`, new FetchAssignedIssuesTool()));
+  context.subscriptions.push(vscode.lm.registerTool(`${AEM_COPILOT_TOOLS_PREFIX}_docsIdentifier`, new DocsIdentifierTool()));
+  context.subscriptions.push(vscode.lm.registerTool(`${AEM_COPILOT_TOOLS_PREFIX}_findFiles`, new FindFilesTool()));
+  context.subscriptions.push(vscode.lm.registerTool(`${AEM_COPILOT_TOOLS_PREFIX}_runInTerminal`, new RunInTerminalTool()));
+  
 }
-
 
 export function parseCopilotResponseToJson(responseTxt: string): any {
   // Extract JSON by removing the code block markers
