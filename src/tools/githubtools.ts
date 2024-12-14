@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { closeIssue, createIssue, extractRepoDetailsFromWorkspace, fetchIssueDetailsByNumber, getGitHubClient } from '../utils/github.helper';
+import { closeIssue, createIssue, extractRepoDetailsFromWorkspace, fetchAssignedIssues, fetchIssueDetailsByNumber, fetchLatestIssueDetails, getGitHubClient } from '../utils/github.helper';
 
 interface ICreateIssueParameters {
     title: string;
@@ -16,7 +16,7 @@ interface IFetchIssueDetailsParameters {
 
 interface IFetchLatestIssueParameters { }
 
-interface IFetchAssignedIssuesParameters { 
+interface IFetchAssignedIssuesParameters {
     username: string;
 }
 
@@ -138,19 +138,10 @@ export class FetchLatestIssueTool implements vscode.LanguageModelTool<IFetchLate
 
         const octokit = await getGitHubClient(workspaceDetails.baseUrl, workspaceDetails.provider);
         try {
-            const issues = await octokit.issues.listForRepo({
-                owner: workspaceDetails.owner,
-                repo: workspaceDetails.repoName,
-                per_page: 1,
-                sort: 'created',
-                direction: 'desc',
-            });
-
-            if (issues.data.length === 0) {
-                return new vscode.LanguageModelToolResult([new vscode.LanguageModelTextPart('No issues found.')]);
+            const latestIssue = await fetchLatestIssueDetails(workspaceDetails.owner, workspaceDetails.repoName, octokit);
+            if (!latestIssue) {
+                return new vscode.LanguageModelToolResult([new vscode.LanguageModelTextPart('No open issues found.')]);
             }
-
-            const latestIssue = issues.data[0];
             return new vscode.LanguageModelToolResult([new vscode.LanguageModelTextPart(`Latest issue details: ${JSON.stringify(latestIssue, null, 2)}`)]);
         } catch (error) {
             return new vscode.LanguageModelToolResult([new vscode.LanguageModelTextPart(`Error fetching latest issue: ${(error as Error).message}`)]);
@@ -190,11 +181,8 @@ export class FetchAssignedIssuesTool implements vscode.LanguageModelTool<IFetchA
             let givenUsername = options.input.username;
             const { data: { login: username } } = await octokit.rest.users.getAuthenticated();
             console.log(`Logged in user name: ${username}`);
-            const issues = await octokit.issues.listForRepo({
-                owner: workspaceDetails.owner,
-                repo: workspaceDetails.repoName,
-                assignee: givenUsername ? givenUsername : username,
-            });
+            const assignee = givenUsername ? givenUsername : username;
+            const issues = await fetchAssignedIssues(workspaceDetails.owner, workspaceDetails.repoName, octokit, assignee);
 
             if (issues.data.length === 0) {
                 return new vscode.LanguageModelToolResult([new vscode.LanguageModelTextPart('No issues assigned to you.')]);
@@ -210,7 +198,7 @@ export class FetchAssignedIssuesTool implements vscode.LanguageModelTool<IFetchA
         options: vscode.LanguageModelToolInvocationPrepareOptions<IFetchAssignedIssuesParameters>,
         _token: vscode.CancellationToken
     ) {
-        const githubUserName = options.input.username ? options.input.username : 'you';
+        const githubUserName = (options.input.username && !options.input.username .includes('your-'))? options.input.username : 'you';
 
         const confirmationMessages = {
             title: 'Fetch Assigned GitHub Issues',

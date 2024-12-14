@@ -12,8 +12,8 @@ import {
 import { createFolderAndFiles } from "./utils/fileHandler";
 import { fetchBlock } from "./handlers/block.collections";
 import { getRandomGreeting, registerAemCopilotTools } from "./utils/helpers";
-import { handleIssueManagement } from "./handlers/issueManagement.handler";
-import { handleTestCommand } from "./handlers/test";
+
+import { handleIssuesCommand } from "./handlers/github";
 import { handleDocsCommand } from "./handlers/docs";
 
 interface IAemChatResult extends vscode.ChatResult {
@@ -43,10 +43,8 @@ export function activate(extensionContext: vscode.ExtensionContext) {
         cmdResult = await fetchBlock(request, chatContext, stream, token, extensionContext);
         logger.logUsage('request', { kind: commands.COLLECION });
       } else if (request.command === commands.ISSUES) {
-        cmdResult = await handleIssueManagement(request, chatContext, stream, token, extensionContext);
+        cmdResult = await handleIssuesCommand(request, chatContext, stream, token, extensionContext);
         logger.logUsage('request', { kind: commands.ISSUES });
-      } else if (request.command === commands.TEST) {
-        return await handleTestCommand(request, chatContext, stream, token, extensionContext);
       } else {
         cmdResult = await handleDocsCommand(request, chatContext, stream, token, extensionContext);
       }

@@ -2,8 +2,9 @@ import * as vscode from 'vscode';
 import { AEM_COMMANDS as commands } from "../aem.commands";
 import * as chatUtils from '@vscode/chat-extension-utils';
 import { MODEL_SELECTOR } from '../constants';
+import { SYSTEM_MESSAGE } from '../prompts/templates/issues';
 
-export async function handleTestCommand(
+export async function handleIssuesCommand(
     request: vscode.ChatRequest,
     chatContext: vscode.ChatContext,
     stream: vscode.ChatResponseStream,
@@ -26,7 +27,7 @@ export async function handleTestCommand(
         request,
         chatContext,
         {
-            prompt: 'You are a helpful AEM developer assistant who can help user with AEM related queries. Given the different git related tools , you have to use them and help user with their queries. Either could be giving solution to their queries or creating a github issue for them.',
+            prompt: SYSTEM_MESSAGE,
             model: model,
             responseStreamOptions: {
                 stream,

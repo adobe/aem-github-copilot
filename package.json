@@ -55,11 +55,7 @@
           },
           {
             "name": "issues",
-            "description": "Issues management for AEM Edge Delivery Services"
-          },
-          {
-            "name": "test",
-            "description": "get github issues details"
+            "description": "Issues management for AEM Edge Delivery Services and Providing AI suggestions"
           },
           {
             "name": "docs",

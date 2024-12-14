@@ -66,7 +66,6 @@ export async function fetchLatestIssueDetails(owner: string, repoName: string, o
         });
 
         if (issues.data.length === 0) {
-            vscode.window.showInformationMessage('No open issues found in the repository');
             return null;
         }
 
@@ -86,7 +85,6 @@ export async function fetchLatestIssueDetails(owner: string, repoName: string, o
             milestone: latestIssue?.milestone || '',
         };
     } catch (error) {
-        vscode.window.showErrorMessage(`Error fetching issue details: ${error}`);
         return null;
     }
 }
@@ -164,3 +162,17 @@ export async function closeIssue(owner: string, repoName: string, octokit: Octok
         vscode.window.showErrorMessage(`Error closing issue: ${error}`);
     }
 }   
+
+export async function fetchAssignedIssues(owner: string, repoName: string, octokit: Octokit, username: string): Promise<any> {
+    try {
+        const issues = await octokit.issues.listForRepo({
+            owner,
+            repo: repoName,
+            state: 'open',
+            assignee: username,
+        });
+        return issues;
+    } catch (error) {
+        return null;
+    }
+}
