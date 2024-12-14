@@ -20,22 +20,22 @@
     "Chat"
   ],
   "keywords": [
-		"chat-participant",
-		"ai",
-		"openai",
-		"anthropic",
-		"gemini",
-		"claude",
-		"vision",
-		"accessibility",
-		"images",
-		"pilot",
-		"co-pilot"
-	],
+    "chat-participant",
+    "ai",
+    "openai",
+    "anthropic",
+    "gemini",
+    "claude",
+    "vision",
+    "accessibility",
+    "images",
+    "pilot",
+    "co-pilot"
+  ],
   "enabledApiProposals": [
-		"chatReferenceBinaryData",
-		"codeActionAI"
-	],
+    "chatReferenceBinaryData",
+    "codeActionAI"
+  ],
   "activationEvents": [],
   "contributes": {
     "chatParticipants": [
@@ -48,18 +48,74 @@
         "commands": [
           {
             "name": "create",
-            "description": "Given a block name, create corresponding files"
-          },{
+            "description": "Given a block name, create corresponding files",
+            "disambiguation": [
+              {
+                "category": "aem_createblock",
+                "description": "User wants to create block for AEM Edge Delivery Services",
+                "examples": [
+                  "a table block with 3 columns and 4 rows",
+                  "a carousel block with 5 images"
+                ]
+              }
+            ]
+          },
+          {
             "name": "collection",
-            "description": "Pull a block from aem block collection repo"
+            "description": "Pull a block from aem block collection repo",
+            "disambiguation": [
+              {
+                "category": "aem_collection",
+                "description": "User wants to pull a block from AEM Edge Delivery Services block collection",
+                "examples": [
+                  "pull a table block",
+                  "pull a carousel block"
+                ]
+              }
+            ] 
           },
           {
             "name": "issues",
-            "description": "Issues management for AEM Edge Delivery Services and Providing AI suggestions"
+            "description": "Issues management for AEM Edge Delivery Services and Providing AI suggestions",
+            "disambiguation": [
+              {
+                "category": "aem_issues",
+                "description": "User wants to manage issues for AEM Edge Delivery Services",
+                "examples": [
+                  "create a new issue",
+                  "close an issue",
+                  "fetch latest issue"
+                ]
+              }
+            ]
           },
           {
             "name": "docs",
-            "description": "Information About AEM Edge Delivery Services"
+            "description": "Information About AEM Edge Delivery Services",
+            "disambiguation": [
+              {
+                "category": "aem_docs",
+                "description": "User wants to know about AEM Edge Delivery Services",
+                "examples": [
+                  "what is AEM Edge Delivery Services",
+                  "how to use AEM Edge Delivery Services",
+                  "how authentication works in AEM Edge Delivery Services"
+                ]
+              }
+            ]
+          }
+        ],
+        "disambiguation": [
+          {
+            "category": "aem",
+            "description": "User wants to interact with AEM Assistant",
+            "examples": [
+              "create a table block",
+              "pull a carousel block",
+              "create a new issue",
+              "fetch latest issue",
+              "what is AEM Edge Delivery Services"
+            ]
           }
         ]
       }
@@ -84,7 +140,7 @@
       ]
     },
     "languageModelTools": [
-      { 
+      {
         "name": "aem_copilot_github_fetchIssueDetails",
         "tags": [
           "github",
@@ -103,7 +159,9 @@
               "description": "Github Issue Number"
             }
           },
-          "required": ["issueNumber"]
+          "required": [
+            "issueNumber"
+          ]
         }
       },
       {
@@ -131,10 +189,13 @@
               "default": "Issue Body"
             }
           },
-          "required": ["title", "body"]
+          "required": [
+            "title",
+            "body"
+          ]
         }
       },
-      { 
+      {
         "name": "aem_copilot_github_closeIssue",
         "tags": [
           "github",
@@ -152,7 +213,9 @@
               "description": "Github Issue Number"
             }
           },
-          "required": ["issueNumber"]
+          "required": [
+            "issueNumber"
+          ]
         }
       },
       {
@@ -173,7 +236,9 @@
               "description": "Github Repository"
             }
           },
-          "required": ["repo"]
+          "required": [
+            "repo"
+          ]
         }
       },
       {
@@ -221,7 +286,9 @@
               "description": "User prompt to identify the docs"
             }
           },
-          "required": ["query"]
+          "required": [
+            "query"
+          ]
         }
       },
       {
