@@ -6,6 +6,7 @@ import {
 
 import {
   AEM_COMMAND_ID,
+  AEM_COPILOT_ANNOTATE_CMD,
   FETCH_ISSUE_DETAIL_CMD,
   PROCESS_COPILOT_CREATE_CMD,
 } from "./constants";
@@ -15,6 +16,7 @@ import { getRandomGreeting, registerAemCopilotTools } from "./utils/helpers";
 
 import { handleIssuesCommand } from "./handlers/github";
 import { handleDocsCommand } from "./handlers/docs";
+import { annotateTextEditor } from "./handlers/annotation";
 
 interface IAemChatResult extends vscode.ChatResult {
   metadata: {
@@ -112,7 +114,8 @@ export function activate(extensionContext: vscode.ExtensionContext) {
     ),
     vscode.commands.registerCommand(FETCH_ISSUE_DETAIL_CMD, async (githubIssue) => {
       vscode.commands.executeCommand(`workbench.action.chat.open`, `@${AEM_COMMAND_ID} /${commands.ISSUES} fetch me details of issue #${githubIssue.number}`);
-    })
+    }),
+    vscode.commands.registerTextEditorCommand(AEM_COPILOT_ANNOTATE_CMD, annotateTextEditor)
   );
 }
 
@@ -135,7 +138,5 @@ function handleError(logger: vscode.TelemetryLogger, err: any, stream: vscode.Ch
     }
   }
 }
-
-
 
 export function deactivate() { }

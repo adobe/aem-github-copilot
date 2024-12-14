@@ -15,6 +15,8 @@ enum LANGUAGE_MODEL_ID {
 // AEM Constants
 export const AEM_COMMAND_ID = "aem";
 export const PROCESS_COPILOT_CREATE_CMD = "aem.createFiles";
+export const AEM_COPILOT_ANNOTATE_CMD = "aem_copilot.annotate";
+
 export const PROCESS_COPILOT_CREATE_CMD_TITLE = "Create Block";
 export const COPILOT_CREATE_CMD = "AEM block with base template";
 

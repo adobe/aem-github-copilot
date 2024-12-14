@@ -68,8 +68,21 @@
       {
         "command": "aem.createFiles",
         "title": "create files/folders for edge delivery services block"
+      },
+      {
+        "command": "aem_copilot.annotate",
+        "title": "AEM Copilot Annotations",
+        "icon": "/resources/logo_tansp.png"
       }
     ],
+    "menus": {
+      "editor/title": [
+        {
+          "command": "aem_copilot.annotate",
+          "group": "navigation"
+        }
+      ]
+    },
     "languageModelTools": [
       { 
         "name": "aem_copilot_github_fetchIssueDetails",
