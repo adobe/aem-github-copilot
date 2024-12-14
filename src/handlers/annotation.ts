@@ -1,5 +1,4 @@
 import vscode from 'vscode';
-import { ANNOTATION_SYSTEM_MESSAGE } from '../prompts/templates/annotations';
 import { AnnotationPrompt } from '../prompts/annotations';
 import { getChatResponse } from '../utils/helpers';
 

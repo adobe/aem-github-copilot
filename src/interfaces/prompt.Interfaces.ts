@@ -12,6 +12,16 @@ export interface PromptProps extends BasePromptElementProps {
     userQuery: string;
 }
 
+
+/**
+ * CreatePromptProps interface extends PromptProps.
+ * @interface
+ * @property {string} blockList - The list of blocks.
+ */
+export interface CreatePromptProps extends PromptProps {
+    sampleBlockCode: string;
+}
+
 /**
  * DocsPromptProps interface extends PromptProps.
  * @interface
@@ -34,7 +44,9 @@ export interface DocsToolPromptProps extends PromptProps {
 * Prompt state for the create prompt
 */
 export interface CreatePromptState {
-    projectStyleCSS: string;
+    projectLevelStyles: string;
+    aemJsFunctions: string;
+    globalJsFunctions: string;
 }
 
 

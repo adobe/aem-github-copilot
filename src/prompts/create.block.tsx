@@ -6,33 +6,34 @@ import {
 } from '@vscode/prompt-tsx';
 
 import * as prompts from "./templates/create.block";
-import { getProjectLevelStyles } from '../utils/helpers';
-import { CreatePromptState, PromptProps } from '../interfaces/prompt.Interfaces';
+import { CreatePromptProps, CreatePromptState } from '../interfaces/prompt.Interfaces';
+import { AEM_JS_FILE_PATH, AEM_SCRIPTS_FILE_PATH, PROJECT_STYLE_PATH } from '../constants';
+import { readFileContent } from '../utils/helpers';
 
-export class CreateBlockPrompt extends PromptElement<PromptProps, CreatePromptState> {
+export class CreateBlockPrompt extends PromptElement<CreatePromptProps, CreatePromptState> {
 
   override async prepare() {
-    let projectLevelStyles = await getProjectLevelStyles();
-    return { projectStyleCSS: projectLevelStyles };
+    const projectLevelStyles = await readFileContent(PROJECT_STYLE_PATH);
+    const aemJsFunctions = await readFileContent(AEM_JS_FILE_PATH);
+    const globalJsFunctions = await readFileContent(AEM_SCRIPTS_FILE_PATH);
+
+    return { projectLevelStyles, aemJsFunctions, globalJsFunctions };
   }
 
   render(state: CreatePromptState, sizing: PromptSizing) {
 
-    let systemMsg = prompts.SYSTEM_MESSAGE;
-    let projectLevelStyles = state.projectStyleCSS;
-
-    systemMsg = systemMsg.replace(
-      "{project-level-styles}",
-      `${projectLevelStyles}`
-    );
-
     return (
       <>
-        <UserMessage>{systemMsg}</UserMessage>
-        <UserMessage>{prompts.SAMPLE_USER_MESSAGE}</UserMessage>
-        <AssistantMessage>{JSON.stringify(prompts.SAMPLE_ASSISTANT_OUTPUT)}</AssistantMessage>
-        <UserMessage>{prompts.SAMPLE_USER_MESSAGE_2}</UserMessage>
-        <AssistantMessage>{JSON.stringify(prompts.SAMPLE_ASSISTANT_OUTPUT_2)}</AssistantMessage>
+        <UserMessage>{prompts.SYSTEM_MESSAGE}</UserMessage>
+        <UserMessage>
+          Here are the project level styles, AEM JS functions and global JS functions:
+          <br />
+          {state.projectLevelStyles}
+          <br />
+          {state.aemJsFunctions}
+        </UserMessage>
+        <UserMessage>Relevant Block Code: {this.props.sampleBlockCode}</UserMessage>
+        <AssistantMessage>Sample Assistant Ouput: {JSON.stringify(prompts.SAMPLE_ASSISTANT_OUTPUT)}</AssistantMessage>
         <UserMessage>{this.props.userQuery}</UserMessage>
       </>
     );

@@ -74,12 +74,13 @@ function getFilePaths(fileTree: string): File[] {
   return result;
 }
 
-
-// parse the resultjson to create nice md string with
-
 export function parseEDSblockJson(resultJson: string) {
-  resultJson = resultJson.replace(/\\\\/g, "\\");
-  const blockJson = JSON.parse(resultJson);
+  const cleanStr = resultJson.replace(/```json\n|```/g, "").trim();
+  const blockJson = JSON.parse(cleanStr);
+  return blockJson;
+}
+
+export function createBlockMarkdown(blockJson: any) {
   const fileTreeMd = createFileTreeMd(blockJson.tree);
   let mdString = `For Creating a block structure, the folder/file structure is as follows:\n
     ${fileTreeMd}\nFile Content of each files are as follows:\n`;
@@ -89,9 +90,7 @@ export function parseEDSblockJson(resultJson: string) {
   if (blockJson.mdtable) {
     mdString += `\n Corresponding table for block should be: \n ${blockJson.mdtable}\n\n`;
   }
-  // if (blockJson.inputHtml) {
-  //   mdString += `\n Corresponding blockinput is:  \n\`\`\`${blockJson.inputHtml}\n\`\`\`\n`;
-  // }
+
   return mdString;
 }
 
@@ -206,25 +205,24 @@ export async function recursiveEDSContent(parentObj: any, folderPath: string) {
   }
 }
 
-
-export async function getProjectLevelStyles(): Promise<string> {
-  const STYLES_PATH = "styles/styles.css";
+export async function readFileContent(path: string): Promise<string> {
+  const uri = vscode.Uri.joinPath(
+    vscode.workspace.workspaceFolders![0].uri,
+    path
+  );
   try {
-    const projectLevelStylesUri = vscode.Uri.joinPath(
-      vscode.workspace.workspaceFolders![0].uri,
-      STYLES_PATH
-    );
-
-    const projectLevelStylesFile = await vscode.workspace.fs.readFile(
-      projectLevelStylesUri
-    );
-    return projectLevelStylesFile.toString();
+    const fileContent = await vscode.workspace.fs.readFile(uri);
+    let fileContentString = new TextDecoder().decode(fileContent);
+    // sanitize the content, remove the comment from top
+    fileContentString = fileContentString.replace(/\/\*[\s\S]*?\*\/|([^\\:]|^)\/\/.*$/gm, '');
+    // remove extra whitespace and newlines
+    fileContentString = fileContentString.replace(/\s+/g, ' ').trim();
+    return fileContentString;
   } catch (error) {
-    console.error("Error reading project level styles", error);
-    return "";
+    console.error("Error reading file", error);
+    throw error;
   }
 }
-
 
 
 /**

@@ -4,7 +4,7 @@ import {
   PROCESS_COPILOT_CREATE_CMD,
   PROCESS_COPILOT_CREATE_CMD_TITLE,
 } from "../constants";
-import { getChatResponse, parseEDSblockJson } from "../utils/helpers";
+import { createBlockMarkdown, getBlockContent, getBlocksList, getChatResponse, parseEDSblockJson } from "../utils/helpers";
 import { CreateBlockPrompt } from "../prompts/create.block";
 
 export async function createCmdHandler(
@@ -14,23 +14,39 @@ export async function createCmdHandler(
   token: vscode.CancellationToken,
   extensionContext: vscode.ExtensionContext
 ): Promise<{ metadata: { command: string } }> {
-  const promptProps = {
-    userQuery: request.prompt,
-  };
-  const chatResponse = await getChatResponse(CreateBlockPrompt, promptProps, token);
-  let resultJsonStr = "";
-  for await (const fragment of chatResponse.text) {
-    resultJsonStr += fragment;
+
+  let blockList = await getBlocksList(extensionContext) || [];
+
+  let selectedblock = blockList.find((block) => request.prompt.includes(block));
+
+  if (!selectedblock) {
+    selectedblock = blockList.length > 0 ? blockList[0] : '';
+  }
+  let blockContent = '';
+  if (selectedblock) {
+    const blockObject = await getBlockContent(selectedblock);
+    blockContent = JSON.stringify(blockObject, null, 2);
   }
 
+  const promptProps = {
+    userQuery: request.prompt,
+    sampleBlockCode: blockContent,
+  };
   try {
-    const blockMd: string = parseEDSblockJson(resultJsonStr);
+    const chatResponse = await getChatResponse(CreateBlockPrompt, promptProps, token);
+    let resultJsonStr = "";
+    for await (const fragment of chatResponse.text) {
+      resultJsonStr += fragment;
+    }
+    const resultJson = parseEDSblockJson(resultJsonStr);
+    const blockMd = createBlockMarkdown(resultJson);
+
     stream.markdown(blockMd);
 
     stream.button({
       command: PROCESS_COPILOT_CREATE_CMD,
       title: vscode.l10n.t(PROCESS_COPILOT_CREATE_CMD_TITLE),
-      arguments: [JSON.parse(resultJsonStr).files],
+      arguments: [resultJson.files],
     });
   } catch (error) {
     console.error("Error parsing result json", error);

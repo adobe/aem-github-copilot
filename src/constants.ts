@@ -49,3 +49,10 @@ export const GREETINGS = [
 ];
 
 export const AEM_COPILOT_TOOLS_PREFIX = "aem_copilot";
+
+
+export const PROJECT_STYLE_PATH = "styles/styles.css";
+
+export const AEM_JS_FILE_PATH = "scripts/aem.js";
+
+export const AEM_SCRIPTS_FILE_PATH = "scripts/scripts.js";
