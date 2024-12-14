@@ -56,3 +56,12 @@ export const PROJECT_STYLE_PATH = "styles/styles.css";
 export const AEM_JS_FILE_PATH = "scripts/aem.js";
 
 export const AEM_SCRIPTS_FILE_PATH = "scripts/scripts.js";
+
+
+export const NO_IMAGE_MESSAGE = vscode.l10n.t('I need a picture to generate a response.');
+export const NO_IMAGE_TYPE_ERROR = vscode.l10n.t('No image type was found from the attachment.');
+export const FILE_NOT_IMAGE_MESSAGE = vscode.l10n.t('The file is not an image.');
+export const NO_RESPONSE_MESSAGE = vscode.l10n.t('No response from the model');
+
+
+export const FETCHING_BLOCK_CONTENT = 'fetching block content...';

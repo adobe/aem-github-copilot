@@ -1,17 +1,12 @@
 import * as vscode from 'vscode';
 import { AEM_COMMANDS as commands } from "../aem.commands";
-import {  PROCESS_COPILOT_CREATE_CMD, PROCESS_COPILOT_CREATE_CMD_TITLE } from '../constants';
+import {  FETCHING_BLOCK_CONTENT, FILE_NOT_IMAGE_MESSAGE, NO_IMAGE_MESSAGE, NO_IMAGE_TYPE_ERROR, NO_RESPONSE_MESSAGE, PROCESS_COPILOT_CREATE_CMD, PROCESS_COPILOT_CREATE_CMD_TITLE } from '../constants';
 import { AzureOpenAI } from "openai";
 import { apiKey, apiVersion, deploymentName, endpoint } from '../constants.local';
 import { getBufferAndMimeTypeFromUri } from '../utils/vscodeImageUtils';
 import { ChatCompletionUserMessageParam } from 'openai/resources/index.mjs';
 import { createBlockMarkdown, getBlockContent, getBlocksList, getChatResponse, parseCopilotJsonResponse } from '../utils/helpers';
 import { CreateBlockPrompt } from '../prompts/create.block';
-
-const NO_IMAGE_MESSAGE = 'I need a picture to generate a response.';
-const NO_IMAGE_TYPE_ERROR = 'No image type was found from the attachment.';
-const FILE_NOT_IMAGE_MESSAGE = 'The file is not an image.';
-const NO_RESPONSE_MESSAGE = 'No response from the model';
 
 export async function handleVisionCommand(
     request: vscode.ChatRequest,
@@ -91,6 +86,13 @@ function createPrompts(userQuery: string, blockListStr: string, base64Strings: B
                 - Also provide styling information for the block to be passed to AI model to enhance the AEM block with that style information.
                 - Provide the output in JSON format to be easily parsable.
 
+                sample output:
+                ----
+                {
+                    "block": "hero",
+                    "style": "white background with blue text and a large image with small font size"
+                }
+
                 ---- given list of AEM Edge Delivery Services blocks ----
                 ${blockListStr}
                 ----
@@ -123,15 +125,16 @@ async function getChatResponseContent(client: AzureOpenAI, prompts: ChatCompleti
 async function handleChatResponse(responseContent: string, request: vscode.ChatRequest, stream: vscode.ChatResponseStream, token: vscode.CancellationToken) {
     try {
         const responseJson = parseCopilotJsonResponse(responseContent);
-        stream.progress(vscode.l10n.t('fetching block content...'));
+        stream.progress(FETCHING_BLOCK_CONTENT);
         const block = responseJson.block;
         const blockStyle = responseJson.style;
         const blockObject = await getBlockContent(block);
         const blockContent = JSON.stringify(blockObject, null, 2);
         const promptProps = {
-            userQuery: `User Query: create ${block} block with the following style: ${JSON.stringify(blockStyle)}`,
+            userQuery: `User Query: create ${block} block with the following style: ${blockStyle}`,
             sampleBlockCode: blockContent,
         };
+        stream.markdown(vscode.l10n.t(`creating ${block} block with the following style: ${blockStyle}`));
         stream.progress(vscode.l10n.t('creating block...'));
         const chatResponse = await getChatResponse(CreateBlockPrompt, promptProps, token);
         let resultJsonStr = "";
