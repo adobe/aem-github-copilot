@@ -178,17 +178,17 @@ export class FetchAssignedIssuesTool implements vscode.LanguageModelTool<IFetchA
 
         const octokit = await getGitHubClient(workspaceDetails.baseUrl, workspaceDetails.provider);
         try {
-            let givenUsername = options.input.username;
+            let givenUsername = options?.input?.username?.toLowerCase()?.includes('your-') ? undefined : options?.input?.username;
             const { data: { login: username } } = await octokit.rest.users.getAuthenticated();
             console.log(`Logged in user name: ${username}`);
             const assignee = givenUsername ? givenUsername : username;
             const issues = await fetchAssignedIssues(workspaceDetails.owner, workspaceDetails.repoName, octokit, assignee);
 
-            if (issues.data.length === 0) {
+            if (issues?.length === 0) {
                 return new vscode.LanguageModelToolResult([new vscode.LanguageModelTextPart('No issues assigned to you.')]);
             }
 
-            return new vscode.LanguageModelToolResult([new vscode.LanguageModelTextPart(`Assigned issues: ${JSON.stringify(issues.data, null, 2)}`)]);
+            return new vscode.LanguageModelToolResult([new vscode.LanguageModelTextPart(`Assigned issues: ${JSON.stringify(issues, null, 2)}`)]);
         } catch (error) {
             return new vscode.LanguageModelToolResult([new vscode.LanguageModelTextPart(`Error fetching assigned issues: ${(error as Error).message}`)]);
         }
@@ -198,8 +198,11 @@ export class FetchAssignedIssuesTool implements vscode.LanguageModelTool<IFetchA
         options: vscode.LanguageModelToolInvocationPrepareOptions<IFetchAssignedIssuesParameters>,
         _token: vscode.CancellationToken
     ) {
-        const githubUserName = (options.input.username && !options.input.username .includes('your-'))? options.input.username : 'you';
 
+        const username = options.input.username?.toLowerCase();
+
+        const githubUserName = (username && !username.includes('your-')) ? username : 'you';
+        
         const confirmationMessages = {
             title: 'Fetch Assigned GitHub Issues',
             message: new vscode.MarkdownString(`Fetch the GitHub issues assigned to ${githubUserName}?`),

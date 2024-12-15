@@ -163,14 +163,32 @@ export async function closeIssue(owner: string, repoName: string, octokit: Octok
 
 export async function fetchAssignedIssues(owner: string, repoName: string, octokit: Octokit, username: string): Promise<any> {
     try {
-        const issues = await octokit.issues.listForRepo({
+        // Fetch issues assigned to the specified user
+        const issuesResponse = await octokit.issues.listForRepo({
             owner,
             repo: repoName,
             state: 'open',
             assignee: username,
         });
-        return issues;
+
+        const issues = issuesResponse.data;
+
+        // Fetch comments for each issue
+        const issuesWithComments = await Promise.all(issues.map(async (issue: any) => {
+            const commentsResponse = await octokit.issues.listComments({
+                owner,
+                repo: repoName,
+                issue_number: issue.number,
+            });
+            return {
+                ...issue,
+                comments: commentsResponse.data,
+            };
+        }));
+
+        return issuesWithComments;
     } catch (error) {
+        vscode.window.showErrorMessage(`Error fetching assigned issues: ${error}`);
         return null;
     }
 }
