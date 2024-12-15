@@ -84,9 +84,8 @@ function applyDecoration(editor: vscode.TextEditor, line: number, suggestion: st
         new vscode.Position(line - 1, lineLength),
         new vscode.Position(line - 1, lineLength)
     );
-
-    const commandUri = vscode.Uri.parse(`command:applyCodeSuggestion?${encodeURIComponent(JSON.stringify({ line, suggestion }))}`);
-    const decoration = { range: range, hoverMessage: new vscode.MarkdownString(`[Apply Change](${commandUri})`).appendText(` ${suggestion}`) };
+    
+    const decoration = { range: range, hoverMessage: new vscode.MarkdownString(``).appendText(` ${suggestion}`) };
         
     // Apply the decoration to the active text editor
     const activeEditor = vscode.window.activeTextEditor;

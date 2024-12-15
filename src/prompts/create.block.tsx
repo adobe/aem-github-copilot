@@ -13,11 +13,17 @@ import { readFileContent } from '../utils/helpers';
 export class CreateBlockPrompt extends PromptElement<CreatePromptProps, CreatePromptState> {
 
   override async prepare() {
-    const projectLevelStyles = await readFileContent(PROJECT_STYLE_PATH);
-    const aemJsFunctions = await readFileContent(AEM_JS_FILE_PATH);
-    const globalJsFunctions = await readFileContent(AEM_SCRIPTS_FILE_PATH);
+    const fileContents = await Promise.all([
+      readFileContent(PROJECT_STYLE_PATH),
+      readFileContent(AEM_JS_FILE_PATH),
+      readFileContent(AEM_SCRIPTS_FILE_PATH),
+    ]);
 
-    return { projectLevelStyles, aemJsFunctions, globalJsFunctions };
+    return {
+      projectLevelStyles: fileContents[0],
+      aemJsFunctions: fileContents[1],
+      globalJsFunctions: fileContents[2],
+    };
   }
 
   render(state: CreatePromptState, sizing: PromptSizing) {
@@ -31,6 +37,8 @@ export class CreateBlockPrompt extends PromptElement<CreatePromptProps, CreatePr
           {state.projectLevelStyles}
           <br />
           {state.aemJsFunctions}
+          <br />
+          {state.globalJsFunctions}
         </UserMessage>
         <UserMessage>Relevant Block Code: {this.props.sampleBlockCode}</UserMessage>
         <AssistantMessage>Sample Assistant Ouput: {JSON.stringify(prompts.SAMPLE_ASSISTANT_OUTPUT)}</AssistantMessage>

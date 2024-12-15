@@ -112,7 +112,6 @@ export async function fetchIssueDetailsByNumber(owner: string, repoName: string,
             milestone: issue.data.milestone || '',
         };
     } catch (error) {
-        vscode.window.showErrorMessage(`Error fetching issue details: ${error}`);
         return null;
     }
 }
@@ -142,7 +141,6 @@ export async function createIssue(owner: string, repoName: string, octokit: Octo
             title,
             body,
         });
-        vscode.window.showInformationMessage('Issue created successfully');
         return issue;
     } catch (error) {
         vscode.window.showErrorMessage(`Error creating issue: ${error}`);
