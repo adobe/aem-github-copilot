@@ -87,9 +87,9 @@ export function createBlockMarkdown(blockJson: any) {
   for (const file of blockJson.files) {
     mdString += `## ${file.path}\n\`\`\`${file.type}\n${file.content}\n\`\`\`\n`;
   }
-  if (blockJson.mdtable) {
-    mdString += `\n Corresponding table for block should be: \n ${blockJson.mdtable}\n\n`;
-  }
+  // if (blockJson.mdtable) {
+  //   mdString += `\n Corresponding table for block should be: \n ${blockJson.mdtable}\n\n`;
+  // }
 
   return mdString;
 }

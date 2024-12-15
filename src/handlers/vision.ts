@@ -134,8 +134,8 @@ async function handleChatResponse(responseContent: string, request: vscode.ChatR
             userQuery: `User Query: create ${block} block with the following style: ${blockStyle}`,
             sampleBlockCode: blockContent,
         };
-        stream.markdown(vscode.l10n.t(`creating ${block} block with the following style: ${blockStyle}`));
-        stream.progress(vscode.l10n.t('creating block...'));
+        stream.markdown(vscode.l10n.t(`Creating ${block} block with the following style:\n\n >***${blockStyle}***\n\n`));
+        stream.progress(vscode.l10n.t('Creating block...'));
         const chatResponse = await getChatResponse(CreateBlockPrompt, promptProps, token);
         let resultJsonStr = "";
         for await (const fragment of chatResponse.text) {
@@ -151,6 +151,6 @@ async function handleChatResponse(responseContent: string, request: vscode.ChatR
             arguments: [resultJson.files],
         });
     } catch (error) {
-        stream.markdown(responseContent);
+        stream.markdown(`Something went wrong, please try again`);
     }
 }

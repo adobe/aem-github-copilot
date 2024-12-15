@@ -30,7 +30,7 @@ export class CreateBlockPrompt extends PromptElement<CreatePromptProps, CreatePr
 
     return (
       <>
-        <UserMessage>{prompts.SYSTEM_MESSAGE}</UserMessage>
+        <UserMessage>{prompts.SYSTEM_MESSAGE_NEW}</UserMessage>
         <UserMessage>
           Here are the project level styles, AEM JS functions and global JS functions:
           <br />
