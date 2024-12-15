@@ -35,7 +35,7 @@ export async function extractRepoDetailsFromWorkspace(): Promise<{ owner: string
         vscode.window.showErrorMessage('Unable to parse GitHub repository URL');
         return null;
     }
-    const isGH = match[1] === 'github.com';
+    const isGH = match[1].includes('github.com');
     return {
         owner: match[2],
         repoName: match[3],
