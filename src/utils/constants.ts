@@ -72,4 +72,4 @@ export const EXTENSION_ICON_PATH = "resources/aem.png";
 
 export const INDEX_URL: string = "https://www.aem.live/docpages-index.json";
 
-export const AZURE_APPLICATION_INSIGHTS_CONNECTION_STRING = 'InstrumentationKey=1458d8d7-7b1d-48f8-b90c-6f0132bd394e;IngestionEndpoint=https://eastus2-3.in.applicationinsights.azure.com/;LiveEndpoint=https://eastus2.livediagnostics.monitor.azure.com/;ApplicationId=ca34c6eb-8c2d-48d5-8514-14cb73d54e85';
+export const AZURE_APP_INSIGHTS_CONN_STR = 'SW5zdHJ1bWVudGF0aW9uS2V5PTE0NThkOGQ3LTdiMWQtNDhmOC1iOTBjLTZmMDEzMmJkMzk0ZTtJbmdlc3Rpb25FbmRwb2ludD1odHRwczovL2Vhc3R1czItMy5pbi5hcHBsaWNhdGlvbmluc2lnaHRzLmF6dXJlLmNvbS87TGl2ZUVuZHBvaW50PWh0dHBzOi8vZWFzdHVzMi5saXZlZGlhZ25vc3RpY3MubW9uaXRvci5henVyZS5jb20vO0FwcGxpY2F0aW9uSWQ9Y2EzNGM2ZWItOGMyZC00OGQ1LTg1MTQtMTRjYjczZDU0ZTg1';

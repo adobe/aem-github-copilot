@@ -7,7 +7,7 @@ import {
 import {
   AEM_COMMAND_ID,
   AEM_COPILOT_ANNOTATE_CMD,
-  AZURE_APPLICATION_INSIGHTS_CONNECTION_STRING,
+  AZURE_APP_INSIGHTS_CONN_STR,
   EXTENSION_ICON_PATH,
   FETCH_ISSUE_DETAIL_CMD,
   PROCESS_COPILOT_CREATE_CMD,
@@ -87,8 +87,7 @@ export function activate(extensionContext: vscode.ExtensionContext) {
     },
   };
 
-  const connectionString = Buffer.from(AZURE_APPLICATION_INSIGHTS_CONNECTION_STRING, 'base64').toString('utf-8');
-  const logger = telemetry.init(AZURE_APPLICATION_INSIGHTS_CONNECTION_STRING);
+  const logger = telemetry.init();
 
   extensionContext.subscriptions.push(aem.onDidReceiveFeedback((feedback: vscode.ChatResultFeedback) => {
     // Log chat result feedback to be able to compute the success matric of the participant

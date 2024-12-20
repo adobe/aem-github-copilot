@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import * as appInsights from 'applicationinsights';
+import { AZURE_APP_INSIGHTS_CONN_STR } from './constants';
 
 //-----------------------------------------------------------------------------
 const tag_mapping: Record<string, string> = {
@@ -70,7 +71,8 @@ export class ApplicationInsightsTelemetrySender implements vscode.TelemetrySende
 
 let reporter: vscode.TelemetryLogger;
 
-export function init(connectionString: string) {
+export function init() {
+    const connectionString = Buffer.from(AZURE_APP_INSIGHTS_CONN_STR, 'base64').toString('utf-8');
     reporter = vscode.env.createTelemetryLogger(new ApplicationInsightsTelemetrySender(connectionString));
     reporter.logUsage('extension.activate');
     return reporter;
