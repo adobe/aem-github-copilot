@@ -1,6 +1,6 @@
 import { Octokit } from "@octokit/rest";
 import * as vscode from "vscode";
-import { Issue } from "../interfaces/issueManagement.interfaces";
+import { Issue } from "../interfaces";
 
 
 // Extracts owner and repo name from the workspace's Git configuration

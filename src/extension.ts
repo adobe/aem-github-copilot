@@ -1,17 +1,19 @@
 import * as vscode from "vscode";
-import { AEM_COMMANDS as commands } from "./aem.commands";
+import { AEM_COMMANDS as commands } from "./enums/aem-commands";
 import {
   createCmdHandler,
-} from "./handlers/block.create";
+} from "./handlers/create";
 
 import {
   AEM_COMMAND_ID,
   AEM_COPILOT_ANNOTATE_CMD,
+  AZURE_APPLICATION_INSIGHTS_CONNECTION_STRING,
+  EXTENSION_ICON_PATH,
   FETCH_ISSUE_DETAIL_CMD,
   PROCESS_COPILOT_CREATE_CMD,
-} from "./constants";
-import { createFolderAndFiles } from "./utils/fileHandler";
-import { fetchBlock } from "./handlers/block.collections";
+} from "./utils/constants";
+import { createFolderAndFiles } from "./utils/file-handler";
+import { fetchBlock } from "./handlers/collections";
 import { getRandomGreeting, registerAemCopilotTools } from "./utils/helpers";
 
 import { handleIssuesCommand } from "./handlers/github";
@@ -19,14 +21,12 @@ import { handleDocsCommand } from "./handlers/docs";
 import { annotateTextEditor } from "./handlers/annotation";
 import { handleVisionCommand } from "./handlers/vision";
 
-interface IAemChatResult extends vscode.ChatResult {
-  metadata: {
-    command: string;
-  };
-}
+import { IAemChatResult } from "./interfaces";
+import * as telemetry from "./utils/telemetry";
 
 export function activate(extensionContext: vscode.ExtensionContext) {
-  // Define a AEM chat handler.
+
+  // register AEM Copilot tools
   registerAemCopilotTools(extensionContext);
 
   const handler: vscode.ChatRequestHandler = async (
@@ -36,6 +36,7 @@ export function activate(extensionContext: vscode.ExtensionContext) {
     token: vscode.CancellationToken
   ): Promise<any> => {
     let cmdResult: any;
+
     stream.progress(vscode.l10n.t(getRandomGreeting()));
 
     try {
@@ -53,6 +54,7 @@ export function activate(extensionContext: vscode.ExtensionContext) {
         logger.logUsage('request', { kind: commands.VISION });
       } else {
         cmdResult = await handleDocsCommand(request, chatContext, stream, token, extensionContext);
+        logger.logUsage('request', { kind: commands.DOCS });  // default command
       }
     } catch (err) {
       handleError(logger, err, stream);
@@ -66,10 +68,9 @@ export function activate(extensionContext: vscode.ExtensionContext) {
   };
 
   const aem = vscode.chat.createChatParticipant(AEM_COMMAND_ID, handler);
-  const path = vscode.Uri.joinPath(extensionContext.extensionUri, "aem.jpeg");
-  aem.iconPath = path;
+  aem.iconPath = vscode.Uri.joinPath(extensionContext.extensionUri, EXTENSION_ICON_PATH);
 
-  // #TODO: Add followup provider  --> need to check
+
   aem.followupProvider = {
     provideFollowups(
       result: IAemChatResult,
@@ -86,19 +87,8 @@ export function activate(extensionContext: vscode.ExtensionContext) {
     },
   };
 
-  const logger = vscode.env.createTelemetryLogger({
-    sendEventData(eventName, data) {
-      // Capture event telemetry
-      console.log(`Event: ${eventName}`);
-      console.log(`Data: ${JSON.stringify(data)}`);
-    },
-    sendErrorData(error, data) {
-      // Capture error telemetry
-      console.error(`Error: ${error}`);
-      console.error(`Data: ${JSON.stringify(data)}`);
-    }
-  });
-
+  const connectionString = Buffer.from(AZURE_APPLICATION_INSIGHTS_CONNECTION_STRING, 'base64').toString('utf-8');
+  const logger = telemetry.init(AZURE_APPLICATION_INSIGHTS_CONNECTION_STRING);
 
   extensionContext.subscriptions.push(aem.onDidReceiveFeedback((feedback: vscode.ChatResultFeedback) => {
     // Log chat result feedback to be able to compute the success matric of the participant

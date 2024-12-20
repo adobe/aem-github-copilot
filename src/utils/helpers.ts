@@ -1,12 +1,12 @@
 import * as vscode from "vscode";
-import { AEM_BLOCK_COLLECTION_URL, AEM_COPILOT_TOOLS_PREFIX, GREETINGS, MODEL_SELECTOR } from "../constants";
+import { AEM_BLOCK_COLLECTION_URL, AEM_COPILOT_TOOLS_PREFIX, GREETINGS, MODEL_SELECTOR } from "./constants";
 
 import { JSDOM } from 'jsdom';
 import { PromptElementCtor, renderPrompt } from "@vscode/prompt-tsx";
-import { PromptProps } from "../interfaces/prompt.Interfaces";
-import { File } from "../interfaces/file.interfaces";
-import { CloseIssueTool, CreateIssueTool, FetchAssignedIssuesTool, FetchIssueDetailsTool, FetchLatestIssueTool } from "../tools/githubtools";
-import { DocsIdentifierTool } from "../tools/docstools";
+import { PromptProps } from "../interfaces/prompt-interfaces";
+import { File } from "../interfaces";
+import { CloseIssueTool, CreateIssueTool, FetchAssignedIssuesTool, FetchIssueDetailsTool, FetchLatestIssueTool } from "../tools/github-tools";
+import { DocsIdentifierTool } from "../tools/docs-tools";
 import { FindFilesTool, RunInTerminalTool } from "../tools/tools";
 
 /**

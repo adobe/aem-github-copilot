@@ -1,7 +1,7 @@
 import vscode from 'vscode';
 import { AnnotationPrompt } from '../prompts/annotations';
 import { getChatResponse } from '../utils/helpers';
-
+import { INDEX_URL } from '../utils/constants';
 
 export async function annotateTextEditor(textEditor: vscode.TextEditor) {
     const codeWithLineNumbers = getVisibleCodeWithLineNumbers(textEditor);
@@ -16,18 +16,17 @@ export async function annotateTextEditor(textEditor: vscode.TextEditor) {
         // send the messages array to the model and get the response
         vscode.window.withProgress({
             location: vscode.ProgressLocation.Notification,
-            title: 'Fetching code annotations...',
+            title: vscode.l10n.t('Fetching code annotations...'),
             cancellable: false
         }, async (progress) => {
             const chatResponse = await getChatResponse(AnnotationPrompt, promptProps, new vscode.CancellationTokenSource().token);
             // handle chat response
             await parseChatResponse(chatResponse, textEditor);
-            vscode.window.showInformationMessage('Code annotations applied successfully!');
+            vscode.window.showInformationMessage(vscode.l10n.t('Code annotations applied successfully!'));
         });
     } catch (error) {
-        vscode.window.showErrorMessage('Failed to fetch code annotations.');
+        vscode.window.showErrorMessage(vscode.l10n.t('Failed to fetch code annotations.'));
     }
-   
 }
 
 function getVisibleCodeWithLineNumbers(textEditor: vscode.TextEditor) {
@@ -64,7 +63,7 @@ async function parseChatResponse(
                 // reset the accumulator for the next line
                 accumulatedResponse = '';
             } catch (e) {
-                vscode.window.showWarningMessage('Failed to parse annotation response.');
+                vscode.window.showWarningMessage(vscode.l10n.t('Failed to parse annotation response.'));
             }
         }
     }
@@ -121,10 +120,10 @@ vscode.commands.registerCommand('applyCodeSuggestion', async (args: { line: numb
 async function fetchAEMBestPractices() {
     const bestPractices = await vscode.window.withProgress({
         location: vscode.ProgressLocation.Notification,
-        title: 'Applying AEM best practices...',
+        title: vscode.l10n.t('Applying AEM best practices...'),
         cancellable: false
     }, async (progress) => {
-        const response = await fetch('https://www.aem.live/docpages-index.json');
+        const response = await fetch(INDEX_URL);
         const bestPracticesJson = await response.json();
         const bestPracticesPage = bestPracticesJson.data.find((element: { path: string; }) => element.path === '/docs/dev-collab-and-good-practices');
         return bestPracticesPage.content;

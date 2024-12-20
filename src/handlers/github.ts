@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
-import { AEM_COMMANDS as commands } from "../aem.commands";
+import { AEM_COMMANDS as commands } from "../enums/aem-commands";
 import * as chatUtils from '@vscode/chat-extension-utils';
-import { MODEL_SELECTOR } from '../constants';
+import { MODEL_SELECTOR } from '../utils/constants';
 import { SYSTEM_MESSAGE } from '../prompts/templates/issues';
 
 export async function handleIssuesCommand(

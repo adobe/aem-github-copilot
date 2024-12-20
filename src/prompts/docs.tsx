@@ -5,7 +5,7 @@ import {
 } from '@vscode/prompt-tsx';
 
 import * as prompts from "./templates/docs";
-import { DocsToolPromptProps } from '../interfaces/prompt.Interfaces';
+import { DocsToolPromptProps } from '../interfaces/prompt-interfaces';
 
 export class DocsToolPrompt extends PromptElement<DocsToolPromptProps, any> {
 

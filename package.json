@@ -142,7 +142,7 @@
       {
         "command": "aem_copilot.annotate",
         "title": "AEM Copilot Annotations",
-        "icon": "/resources/logo_tansp.png"
+        "icon": "/resources/logo.png"
       }
     ],
     "menus": {
@@ -349,7 +349,32 @@
           ]
         }
       }
-    ]
+    ],
+    "configuration": {
+      "title": "Azure OpenAI Configuration For Vision Command",
+      "properties": {
+        "extension.apiKey": {
+          "type": "string",
+          "default": "",
+          "description": "API Key for the extension"
+        },
+        "extension.endpoint": {
+          "type": "string",
+          "default": "",
+          "description": "Endpoint for the extension"
+        },
+        "extension.apiVersion": {
+          "type": "string",
+          "default": "",
+          "description": "API Version for the extension"
+        },
+        "extension.deploymentName": {
+          "type": "string",
+          "default": "",
+          "description": "Deployment Name for the extension"
+        }
+      }
+    }
   },
   "main": "./dist/extension.js",
   "scripts": {
@@ -386,6 +411,7 @@
   "dependencies": {
     "@vscode/chat-extension-utils": "^0.0.0-alpha.1",
     "@vscode/prompt-tsx": "^0.3.0-alpha.12",
+    "applicationinsights": "^3.4.0",
     "jsdom": "^24.1.0",
     "openai": "^4.76.3"
   }

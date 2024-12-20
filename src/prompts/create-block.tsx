@@ -5,9 +5,9 @@ import {
   AssistantMessage
 } from '@vscode/prompt-tsx';
 
-import * as prompts from "./templates/create.block";
-import { CreatePromptProps, CreatePromptState } from '../interfaces/prompt.Interfaces';
-import { AEM_JS_FILE_PATH, AEM_SCRIPTS_FILE_PATH, PROJECT_STYLE_PATH } from '../constants';
+import * as prompts from "./templates/create-block";
+import { CreatePromptProps, CreatePromptState } from '../interfaces/prompt-interfaces';
+import { AEM_JS_FILE_PATH, AEM_SCRIPTS_FILE_PATH, PROJECT_STYLE_PATH } from '../utils/constants';
 import { readFileContent } from '../utils/helpers';
 
 export class CreateBlockPrompt extends PromptElement<CreatePromptProps, CreatePromptState> {

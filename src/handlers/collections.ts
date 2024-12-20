@@ -1,9 +1,9 @@
 import * as vscode from "vscode";
-import { AEM_COMMANDS as commands } from "../aem.commands";
+import { AEM_COMMANDS as commands } from "../enums/aem-commands";
 import {
   PROCESS_COPILOT_CREATE_CMD,
   PROCESS_COPILOT_CREATE_CMD_TITLE,
-} from "../constants";
+} from "../utils/constants";
 import { getBlockContent, getBlocksList } from "../utils/helpers";
 
 export async function fetchBlock(

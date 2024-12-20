@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { closeIssue, createIssue, extractRepoDetailsFromWorkspace, fetchAssignedIssues, fetchIssueDetailsByNumber, fetchLatestIssueDetails, getGitHubClient } from '../utils/github.helper';
+import { closeIssue, createIssue, extractRepoDetailsFromWorkspace, fetchAssignedIssues, fetchIssueDetailsByNumber, fetchLatestIssueDetails, getGitHubClient } from '../utils/github-helper';
 
 interface ICreateIssueParameters {
     title: string;
@@ -28,14 +28,14 @@ export class CreateIssueTool implements vscode.LanguageModelTool<ICreateIssuePar
         const params = options.input;
         const workspaceDetails = await extractRepoDetailsFromWorkspace();
         if (!workspaceDetails) {
-            return new vscode.LanguageModelToolResult([new vscode.LanguageModelTextPart('Repository details not found.')]);
+            return new vscode.LanguageModelToolResult([new vscode.LanguageModelTextPart(vscode.l10n.t('Repository details not found.'))]);
         }
         const octokit = await getGitHubClient(workspaceDetails.baseUrl, workspaceDetails.provider);
         try {
             const issue = await createIssue(workspaceDetails.owner, workspaceDetails.repoName, octokit, params.title, params.body);
-            return new vscode.LanguageModelToolResult([new vscode.LanguageModelTextPart(`Issue created: ${issue.data.html_url}`)]);
+            return new vscode.LanguageModelToolResult([new vscode.LanguageModelTextPart(vscode.l10n.t('Issue created: {0}', issue.data.html_url))]);
         } catch (error) {
-            return new vscode.LanguageModelToolResult([new vscode.LanguageModelTextPart(`Error creating issue: ${(error as Error).message}`)]);
+            return new vscode.LanguageModelToolResult([new vscode.LanguageModelTextPart(vscode.l10n.t('Error creating issue: {0}', (error as Error).message))]);
         }
     }
 
@@ -44,12 +44,12 @@ export class CreateIssueTool implements vscode.LanguageModelTool<ICreateIssuePar
         _token: vscode.CancellationToken
     ) {
         const confirmationMessages = {
-            title: 'Create GitHub Issue',
-            message: new vscode.MarkdownString(`Create a new GitHub issue with the title "${options.input.title}"?`),
+            title: vscode.l10n.t('Create GitHub Issue'),
+            message: new vscode.MarkdownString(vscode.l10n.t('Create a new GitHub issue with the title "{0}"?', options.input.title)),
         };
 
         return {
-            invocationMessage: 'Creating GitHub issue',
+            invocationMessage: vscode.l10n.t('Creating GitHub issue'),
             confirmationMessages,
         };
     }
@@ -63,14 +63,14 @@ export class CloseIssueTool implements vscode.LanguageModelTool<ICloseIssueParam
         const params = options.input;
         const workspaceDetails = await extractRepoDetailsFromWorkspace();
         if (!workspaceDetails) {
-            return new vscode.LanguageModelToolResult([new vscode.LanguageModelTextPart('Repository details not found.')]);
+            return new vscode.LanguageModelToolResult([new vscode.LanguageModelTextPart(vscode.l10n.t('Repository details not found.'))]);
         }
         const octokit = await getGitHubClient(workspaceDetails.baseUrl, workspaceDetails.provider);
         try {
             await closeIssue(workspaceDetails.owner, workspaceDetails.repoName, octokit, params.issueNumber);
-            return new vscode.LanguageModelToolResult([new vscode.LanguageModelTextPart(`Issue #${params.issueNumber} closed.`)]);
+            return new vscode.LanguageModelToolResult([new vscode.LanguageModelTextPart(vscode.l10n.t('Issue #{0} closed.', params.issueNumber))]);
         } catch (error) {
-            return new vscode.LanguageModelToolResult([new vscode.LanguageModelTextPart(`Error closing issue: ${(error as Error).message}`)]);
+            return new vscode.LanguageModelToolResult([new vscode.LanguageModelTextPart(vscode.l10n.t('Error closing issue: {0}', (error as Error).message))]);
         }
     }
 
@@ -79,12 +79,12 @@ export class CloseIssueTool implements vscode.LanguageModelTool<ICloseIssueParam
         _token: vscode.CancellationToken
     ) {
         const confirmationMessages = {
-            title: 'Close GitHub Issue',
-            message: new vscode.MarkdownString(`Close GitHub issue #${options.input.issueNumber}?`),
+            title: vscode.l10n.t('Close GitHub Issue'),
+            message: new vscode.MarkdownString(vscode.l10n.t('Close GitHub issue #{0}?', options.input.issueNumber)),
         };
 
         return {
-            invocationMessage: 'Closing GitHub issue',
+            invocationMessage: vscode.l10n.t('Closing GitHub issue'),
             confirmationMessages,
         };
     }
@@ -98,15 +98,15 @@ export class FetchIssueDetailsTool implements vscode.LanguageModelTool<IFetchIss
         const params = options.input;
         const workspaceDetails = await extractRepoDetailsFromWorkspace();
         if (!workspaceDetails) {
-            return new vscode.LanguageModelToolResult([new vscode.LanguageModelTextPart('Repository details not found.')]);
+            return new vscode.LanguageModelToolResult([new vscode.LanguageModelTextPart(vscode.l10n.t('Repository details not found.'))]);
         }
 
         const octokit = await getGitHubClient(workspaceDetails.baseUrl, workspaceDetails.provider);
         try {
             const issue = await fetchIssueDetailsByNumber(workspaceDetails.owner, workspaceDetails.repoName, params.issueNumber, octokit);
-            return new vscode.LanguageModelToolResult([new vscode.LanguageModelTextPart(`Issue details: ${JSON.stringify(issue, null, 2)}`)]);
+            return new vscode.LanguageModelToolResult([new vscode.LanguageModelTextPart(vscode.l10n.t('Issue details: {0}', JSON.stringify(issue, null, 2)))]);
         } catch (error) {
-            return new vscode.LanguageModelToolResult([new vscode.LanguageModelTextPart(`Error fetching issue details: ${(error as Error).message}`)]);
+            return new vscode.LanguageModelToolResult([new vscode.LanguageModelTextPart(vscode.l10n.t('Error fetching issue details: {0}', (error as Error).message))]);
         }
     }
 
@@ -115,12 +115,12 @@ export class FetchIssueDetailsTool implements vscode.LanguageModelTool<IFetchIss
         _token: vscode.CancellationToken
     ) {
         const confirmationMessages = {
-            title: 'Fetch GitHub Issue Details',
-            message: new vscode.MarkdownString(`Fetch details for GitHub issue #${options.input.issueNumber}?`),
+            title: vscode.l10n.t('Fetch GitHub Issue Details'),
+            message: new vscode.MarkdownString(vscode.l10n.t('Fetch details for GitHub issue #{0}?', options.input.issueNumber)),
         };
 
         return {
-            invocationMessage: 'Fetching GitHub issue details',
+            invocationMessage: vscode.l10n.t('Fetching GitHub issue details'),
             confirmationMessages,
         };
     }
@@ -133,18 +133,18 @@ export class FetchLatestIssueTool implements vscode.LanguageModelTool<IFetchLate
     ) {
         const workspaceDetails = await extractRepoDetailsFromWorkspace();
         if (!workspaceDetails) {
-            return new vscode.LanguageModelToolResult([new vscode.LanguageModelTextPart('Repository details not found.')]);
+            return new vscode.LanguageModelToolResult([new vscode.LanguageModelTextPart(vscode.l10n.t('Repository details not found.'))]);
         }
 
         const octokit = await getGitHubClient(workspaceDetails.baseUrl, workspaceDetails.provider);
         try {
             const latestIssue = await fetchLatestIssueDetails(workspaceDetails.owner, workspaceDetails.repoName, octokit);
             if (!latestIssue) {
-                return new vscode.LanguageModelToolResult([new vscode.LanguageModelTextPart('No open issues found.')]);
+                return new vscode.LanguageModelToolResult([new vscode.LanguageModelTextPart(vscode.l10n.t('No open issues found.'))]);
             }
-            return new vscode.LanguageModelToolResult([new vscode.LanguageModelTextPart(`Latest issue details: ${JSON.stringify(latestIssue, null, 2)}`)]);
+            return new vscode.LanguageModelToolResult([new vscode.LanguageModelTextPart(vscode.l10n.t('Latest issue details: {0}', JSON.stringify(latestIssue, null, 2)))]);
         } catch (error) {
-            return new vscode.LanguageModelToolResult([new vscode.LanguageModelTextPart(`Error fetching latest issue: ${(error as Error).message}`)]);
+            return new vscode.LanguageModelToolResult([new vscode.LanguageModelTextPart(vscode.l10n.t('Error fetching latest issue: {0}', (error as Error).message))]);
         }
     }
 
@@ -153,12 +153,12 @@ export class FetchLatestIssueTool implements vscode.LanguageModelTool<IFetchLate
         _token: vscode.CancellationToken
     ) {
         const confirmationMessages = {
-            title: 'Fetch Latest GitHub Issue',
-            message: new vscode.MarkdownString('Fetch the latest GitHub issue?'),
+            title: vscode.l10n.t('Fetch Latest GitHub Issue'),
+            message: new vscode.MarkdownString(vscode.l10n.t('Fetch the latest GitHub issue?')),
         };
 
         return {
-            invocationMessage: 'Fetching latest GitHub issue',
+            invocationMessage: vscode.l10n.t('Fetching latest GitHub issue'),
             confirmationMessages,
         };
     }
@@ -169,28 +169,26 @@ export class FetchAssignedIssuesTool implements vscode.LanguageModelTool<IFetchA
         options: vscode.LanguageModelToolInvocationOptions<IFetchAssignedIssuesParameters>,
         _token: vscode.CancellationToken
     ) {
-
-
         const workspaceDetails = await extractRepoDetailsFromWorkspace();
         if (!workspaceDetails) {
-            return new vscode.LanguageModelToolResult([new vscode.LanguageModelTextPart('Repository details not found.')]);
+            return new vscode.LanguageModelToolResult([new vscode.LanguageModelTextPart(vscode.l10n.t('Repository details not found.'))]);
         }
 
         const octokit = await getGitHubClient(workspaceDetails.baseUrl, workspaceDetails.provider);
         try {
             let givenUsername = options?.input?.username?.toLowerCase()?.includes('your-') ? undefined : options?.input?.username;
             const { data: { login: username } } = await octokit.rest.users.getAuthenticated();
-            console.log(`Logged in user name: ${username}`);
+            console.log(vscode.l10n.t('Logged in user name: {0}', username));
             const assignee = givenUsername ? givenUsername : username;
             const issues = await fetchAssignedIssues(workspaceDetails.owner, workspaceDetails.repoName, octokit, assignee);
 
             if (issues?.length === 0) {
-                return new vscode.LanguageModelToolResult([new vscode.LanguageModelTextPart('No issues assigned to you.')]);
+                return new vscode.LanguageModelToolResult([new vscode.LanguageModelTextPart(vscode.l10n.t('No issues assigned to you.'))]);
             }
 
-            return new vscode.LanguageModelToolResult([new vscode.LanguageModelTextPart(`Assigned issues: ${JSON.stringify(issues, null, 2)}`)]);
+            return new vscode.LanguageModelToolResult([new vscode.LanguageModelTextPart(vscode.l10n.t('Assigned issues: {0}', JSON.stringify(issues, null, 2)))]);
         } catch (error) {
-            return new vscode.LanguageModelToolResult([new vscode.LanguageModelTextPart(`Error fetching assigned issues: ${(error as Error).message}`)]);
+            return new vscode.LanguageModelToolResult([new vscode.LanguageModelTextPart(vscode.l10n.t('Error fetching assigned issues: {0}', (error as Error).message))]);
         }
     }
 
@@ -198,18 +196,16 @@ export class FetchAssignedIssuesTool implements vscode.LanguageModelTool<IFetchA
         options: vscode.LanguageModelToolInvocationPrepareOptions<IFetchAssignedIssuesParameters>,
         _token: vscode.CancellationToken
     ) {
-
         const username = options.input.username?.toLowerCase();
-
-        const githubUserName = (username && !username.includes('your-')) ? username : 'you';
+        const githubUserName = (username && !username.includes('your-')) ? username : vscode.l10n.t('you');
         
         const confirmationMessages = {
-            title: 'Fetch Assigned GitHub Issues',
-            message: new vscode.MarkdownString(`Fetch the GitHub issues assigned to ${githubUserName}?`),
+            title: vscode.l10n.t('Fetch Assigned GitHub Issues'),
+            message: new vscode.MarkdownString(vscode.l10n.t('Fetch the GitHub issues assigned to {0}?', githubUserName)),
         };
 
         return {
-            invocationMessage: 'Fetching assigned GitHub issues',
+            invocationMessage: vscode.l10n.t('Fetching assigned GitHub issues'),
             confirmationMessages,
         };
     }

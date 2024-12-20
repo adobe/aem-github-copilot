@@ -1,9 +1,8 @@
 import * as vscode from 'vscode';
 import { getChatResponse, parseCopilotResponseToJson } from '../utils/helpers';
-import { DocsToolPromptProps } from '../interfaces/prompt.Interfaces';
+import { DocsToolPromptProps } from '../interfaces/prompt-interfaces';
 import { DocsToolPrompt } from '../prompts/docs';
-
-const INDEX_URL: string = "https://www.aem.live/docpages-index.json";
+import { INDEX_URL } from '../utils/constants';
 
 interface IDocsIdentifierParameters {
     query: string;
@@ -69,12 +68,12 @@ export class DocsIdentifierTool implements vscode.LanguageModelTool<IDocsIdentif
         _token: vscode.CancellationToken
     ) {
         const confirmationMessages = {
-            title: 'Identify Relevant Docs',
-            message: new vscode.MarkdownString(`Identify relevant documents for the query "${options.input.query}"?`),
+            title: vscode.l10n.t('Identify Relevant Docs'),
+            message: new vscode.MarkdownString(vscode.l10n.t(`Identify relevant documents for the query "${options.input.query}"?`)),
         };
 
         return {
-            invocationMessage: 'Identifying relevant documents',
+            invocationMessage: vscode.l10n.t('Identifying relevant documents'),
             confirmationMessages,
         };
     }

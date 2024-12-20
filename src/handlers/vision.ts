@@ -1,12 +1,11 @@
 import * as vscode from 'vscode';
-import { AEM_COMMANDS as commands } from "../aem.commands";
-import {  FETCHING_BLOCK_CONTENT, FILE_NOT_IMAGE_MESSAGE, NO_IMAGE_MESSAGE, NO_IMAGE_TYPE_ERROR, NO_RESPONSE_MESSAGE, PROCESS_COPILOT_CREATE_CMD, PROCESS_COPILOT_CREATE_CMD_TITLE } from '../constants';
+import { AEM_COMMANDS as commands } from "../enums/aem-commands";
+import { FETCHING_BLOCK_CONTENT, FILE_NOT_IMAGE_MESSAGE, NO_IMAGE_MESSAGE, NO_IMAGE_TYPE_ERROR, NO_RESPONSE_MESSAGE, PROCESS_COPILOT_CREATE_CMD, PROCESS_COPILOT_CREATE_CMD_TITLE } from '../utils/constants';
 import { AzureOpenAI } from "openai";
-import { apiKey, apiVersion, deploymentName, endpoint } from '../constants.local';
-import { getBufferAndMimeTypeFromUri } from '../utils/vscodeImageUtils';
+import { getBufferAndMimeTypeFromUri } from '../utils/image-utils';
 import { ChatCompletionUserMessageParam } from 'openai/resources/index.mjs';
 import { createBlockMarkdown, getBlockContent, getBlocksList, getChatResponse, parseCopilotJsonResponse } from '../utils/helpers';
-import { CreateBlockPrompt } from '../prompts/create.block';
+import { CreateBlockPrompt } from '../prompts/create-block';
 
 export async function handleVisionCommand(
     request: vscode.ChatRequest,
@@ -16,8 +15,32 @@ export async function handleVisionCommand(
     extensionContext: vscode.ExtensionContext
 ) {
     try {
+        if (!vscode.env.appName.includes('Insiders')) {
+            stream.markdown(vscode.l10n.t('This command is only available on VS Code Insiders.'));
+            vscode.window.showErrorMessage(vscode.l10n.t('This command is only available on VS Code Insiders.'));
+            return { metadata: { command: '' } };
+        }
+
+        stream.progress(vscode.l10n.t('Please provide the API Key, Endpoint, API Version, and Deployment Name in the settings to use this command.'));
+        let apiKey = await getOrPromptForConfig('extension.apiKey', vscode.l10n.t('Enter API Key'));
+        let endpoint = await getOrPromptForConfig('extension.endpoint', vscode.l10n.t('Enter Endpoint'));
+        let apiVersion = await getOrPromptForConfig('extension.apiVersion', vscode.l10n.t('Enter API Version'));
+        let deploymentName = await getOrPromptForConfig('extension.deploymentName', vscode.l10n.t('Enter Deployment Name'));
+
+        if (!apiKey || !endpoint || !apiVersion || !deploymentName) {
+            vscode.window.showErrorMessage(vscode.l10n.t('API Key, Endpoint, API Version, and Deployment Name are required to use this command.'));
+            return { metadata: { command: '' } };
+        }
+
         stream.progress(vscode.l10n.t('Analyzing image...'));
-        const client = createAzureOpenAIClient();
+        let client;
+        try {
+            client = createAzureOpenAIClient(apiKey, endpoint, apiVersion, deploymentName);
+        } catch (error) {
+            vscode.window.showErrorMessage(vscode.l10n.t('Invalid credentials. Please try again'));
+            return { metadata: { command: '' } };
+        }
+        
         const userQuery = request.prompt;
         const blockList = await getBlocksList(extensionContext);
         const blockListStr = blockList?.join("\n - ") || '';
@@ -32,18 +55,42 @@ export async function handleVisionCommand(
         if (!mimeType) throw new Error(NO_IMAGE_TYPE_ERROR);
 
         const prompts = createPrompts(userQuery, blockListStr, base64Strings, mimeType);
-        const responseContent = await getChatResponseContent(client, prompts);
-
-        await handleChatResponse(responseContent, request, stream, token);
-
+        try {
+            const responseContent = await getChatResponseContent(client, prompts);
+            await handleChatResponse(responseContent, request, stream, token);
+        } catch (error) {
+            stream.markdown(vscode.l10n.t('Azure OpenAI credentials are invalid. Please try again...'));
+            clearConfigurationOnError();
+            throw error;
+        }
         return { metadata: { command: commands.VISION } };
     } catch (error) {
         console.error(error);
+        vscode.window.showErrorMessage(vscode.l10n.t('An error occurred, please try again'));
         return { metadata: { command: '' } };
     }
 }
 
-function createAzureOpenAIClient() {
+async function clearConfigurationOnError() {
+    const configKeys = ['extension.apiKey', 'extension.endpoint', 'extension.apiVersion', 'extension.deploymentName'];
+    for (const key of configKeys) {
+        await vscode.workspace.getConfiguration().update(key, undefined, vscode.ConfigurationTarget.Global);
+    }
+}
+
+
+async function getOrPromptForConfig(configKey: string, promptMessage: string, forcePrompt: boolean = false): Promise<string> {
+    let configValue = vscode.workspace.getConfiguration().get<string>(configKey) || '';
+    if (!configValue || forcePrompt) {
+        configValue = await vscode.window.showInputBox({ prompt: promptMessage, ignoreFocusOut: true }) || '';
+        if (configValue) {
+            await vscode.workspace.getConfiguration().update(configKey, configValue, vscode.ConfigurationTarget.Global);
+        }
+    }
+    return configValue;
+}
+
+function createAzureOpenAIClient(apiKey: string, endpoint: string, apiVersion: string, deploymentName: string) {
     return new AzureOpenAI({
         apiKey: apiKey,
         endpoint: endpoint,
@@ -147,10 +194,10 @@ async function handleChatResponse(responseContent: string, request: vscode.ChatR
         stream.markdown(blockMd);
         stream.button({
             command: PROCESS_COPILOT_CREATE_CMD,
-            title: vscode.l10n.t(PROCESS_COPILOT_CREATE_CMD_TITLE),
+            title: `${vscode.l10n.t(PROCESS_COPILOT_CREATE_CMD_TITLE) } $(thumbsup)`,
             arguments: [resultJson.files],
         });
     } catch (error) {
-        stream.markdown(`Something went wrong, please try again`);
+        stream.markdown(vscode.l10n.t('Something went wrong, please try again'));
     }
 }
