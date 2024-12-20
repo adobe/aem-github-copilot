@@ -1,10 +1,13 @@
 import * as vscode from "vscode";
-import { AEM_BLOCK_COLLECTION_URL, GREETINGS, MODEL_SELECTOR } from "../constants";
+import { AEM_BLOCK_COLLECTION_URL, AEM_COPILOT_TOOLS_PREFIX, GREETINGS, MODEL_SELECTOR } from "./constants";
 
 import { JSDOM } from 'jsdom';
 import { PromptElementCtor, renderPrompt } from "@vscode/prompt-tsx";
-import { PromptProps } from "../interfaces/prompt.Interfaces";
-import { File } from "../interfaces/file.interfaces";
+import { PromptProps } from "../interfaces/prompt-interfaces";
+import { File } from "../interfaces";
+import { CloseIssueTool, CreateIssueTool, FetchAssignedIssuesTool, FetchIssueDetailsTool, FetchLatestIssueTool } from "../tools/github-tools";
+import { DocsIdentifierTool } from "../tools/docs-tools";
+import { FindFilesTool, RunInTerminalTool } from "../tools/tools";
 
 /**
  * Parses a string into a JSON object containing file information using regular expressions,
@@ -71,24 +74,23 @@ function getFilePaths(fileTree: string): File[] {
   return result;
 }
 
+export function parseCopilotJsonResponse(resultJson: string) {
+  const cleanStr = resultJson.replace(/```json\n|```/g, "").trim();
+  const blockJson = JSON.parse(cleanStr);
+  return blockJson;
+}
 
-// parse the resultjson to create nice md string with
-
-export function parseEDSblockJson(resultJson: string) {
-  resultJson = resultJson.replace(/\\\\/g, "\\");
-  const blockJson = JSON.parse(resultJson);
+export function createBlockMarkdown(blockJson: any) {
   const fileTreeMd = createFileTreeMd(blockJson.tree);
   let mdString = `For Creating a block structure, the folder/file structure is as follows:\n
     ${fileTreeMd}\nFile Content of each files are as follows:\n`;
   for (const file of blockJson.files) {
     mdString += `## ${file.path}\n\`\`\`${file.type}\n${file.content}\n\`\`\`\n`;
   }
-  if (blockJson.mdtable) {
-    mdString += `\n Corresponding table for block should be: \n ${blockJson.mdtable}\n\n`;
-  }
-  // if (blockJson.inputHtml) {
-  //   mdString += `\n Corresponding blockinput is:  \n\`\`\`${blockJson.inputHtml}\n\`\`\`\n`;
+  // if (blockJson.mdtable) {
+  //   mdString += `\n Corresponding table for block should be: \n ${blockJson.mdtable}\n\n`;
   // }
+
   return mdString;
 }
 
@@ -180,7 +182,7 @@ export async function getFileContent(filePath: string) {
 export async function recursiveEDSContent(parentObj: any, folderPath: string) {
   let { folders, files } = await getEDSContent(`${folderPath}/`);
   for (let file of files) {
-    const filePath = parentObj.path + '/'+ file;
+    const filePath = parentObj.path + '/' + file;
     const fileContent = await getFileContent(filePath);
     parentObj.children.push({
       type: 'file',
@@ -191,7 +193,7 @@ export async function recursiveEDSContent(parentObj: any, folderPath: string) {
   }
 
   for (const folder of folders) {
-    const folderPath = parentObj.path + '/'+ folder;
+    const folderPath = parentObj.path + '/' + folder;
     const folderObj = {
       type: 'folder',
       name: folder,
@@ -203,25 +205,24 @@ export async function recursiveEDSContent(parentObj: any, folderPath: string) {
   }
 }
 
-
-export async function getProjectLevelStyles(): Promise<string> {
-  const STYLES_PATH = "styles/styles.css";
+export async function readFileContent(path: string): Promise<string> {
+  const uri = vscode.Uri.joinPath(
+    vscode.workspace.workspaceFolders![0].uri,
+    path
+  );
   try {
-    const projectLevelStylesUri = vscode.Uri.joinPath(
-      vscode.workspace.workspaceFolders![0].uri,
-      STYLES_PATH
-    );
-
-    const projectLevelStylesFile = await vscode.workspace.fs.readFile(
-      projectLevelStylesUri
-    );
-    return projectLevelStylesFile.toString();
+    const fileContent = await vscode.workspace.fs.readFile(uri);
+    let fileContentString = new TextDecoder().decode(fileContent);
+    // sanitize the content, remove the comment from top
+    fileContentString = fileContentString.replace(/\/\*[\s\S]*?\*\/|([^\\:]|^)\/\/.*$/gm, '');
+    // remove extra whitespace and newlines
+    fileContentString = fileContentString.replace(/\s+/g, ' ').trim();
+    return fileContentString;
   } catch (error) {
-    console.error("Error reading project level styles", error);
-    return "";
+    console.error("Error reading file", error);
+    throw error;
   }
 }
-
 
 
 /**
@@ -235,7 +236,7 @@ export async function getProjectLevelStyles(): Promise<string> {
  * 
  * @throws {Error} - Throws an error if no language model is found.
  */
-export async function getChatResponse<T extends PromptElementCtor<P, any>, P extends PromptProps>(prompt:T, promptProps: P, token: vscode.CancellationToken): Promise<Thenable<vscode.LanguageModelChatResponse>> {
+export async function getChatResponse<T extends PromptElementCtor<P, any>, P extends PromptProps>(prompt: T, promptProps: P, token: vscode.CancellationToken): Promise<Thenable<vscode.LanguageModelChatResponse>> {
   const [model] = await vscode.lm.selectChatModels(MODEL_SELECTOR);
   if (model) {
     const { messages } = await renderPrompt(
@@ -252,3 +253,36 @@ export async function getChatResponse<T extends PromptElementCtor<P, any>, P ext
 export const getRandomGreeting = () => {
   return GREETINGS[Math.floor(Math.random() * GREETINGS.length)];
 };
+
+
+export function registerAemCopilotTools(context: vscode.ExtensionContext) {
+  context.subscriptions.push(vscode.lm.registerTool(`${AEM_COPILOT_TOOLS_PREFIX}_github_createIssue`, new CreateIssueTool()));
+  context.subscriptions.push(vscode.lm.registerTool(`${AEM_COPILOT_TOOLS_PREFIX}_github_closeIssue`, new CloseIssueTool()));
+  context.subscriptions.push(vscode.lm.registerTool(`${AEM_COPILOT_TOOLS_PREFIX}_github_fetchIssueDetails`, new FetchIssueDetailsTool()));
+  context.subscriptions.push(vscode.lm.registerTool(`${AEM_COPILOT_TOOLS_PREFIX}_github_fetchLatestIssue`, new FetchLatestIssueTool()));
+  context.subscriptions.push(vscode.lm.registerTool(`${AEM_COPILOT_TOOLS_PREFIX}_github_fetchAssignedIssue`, new FetchAssignedIssuesTool()));
+  context.subscriptions.push(vscode.lm.registerTool(`${AEM_COPILOT_TOOLS_PREFIX}_docsIdentifier`, new DocsIdentifierTool()));
+  context.subscriptions.push(vscode.lm.registerTool(`${AEM_COPILOT_TOOLS_PREFIX}_findFiles`, new FindFilesTool()));
+  context.subscriptions.push(vscode.lm.registerTool(`${AEM_COPILOT_TOOLS_PREFIX}_runInTerminal`, new RunInTerminalTool()));
+  
+}
+
+export function parseCopilotResponseToJson(responseTxt: string): any {
+  // Extract JSON by removing the code block markers
+  const jsonString = responseTxt.replace(/^\`\`\`json\n/, '').replace(/\n\`\`\`$/, '');
+
+  // Parse the JSON string
+  let jsonData;
+  try {
+    jsonData = JSON.parse(jsonString);
+  } catch (error) {
+    console.error("Failed to parse JSON:", error);
+  }
+
+  // Iterate over the JSON data
+  if (Array.isArray(jsonData)) {
+    return jsonData;
+  } else {
+    return {};
+  }
+}

@@ -1,48 +1,58 @@
 import * as vscode from "vscode";
-import { AEM_COMMANDS as commands } from "./aem.commands";
+import { AEM_COMMANDS as commands } from "./enums/aem-commands";
 import {
   createCmdHandler,
-} from "./handlers/block.create";
-import { handleDocsCommand } from "./handlers/block.docs";
+} from "./handlers/create";
 
 import {
   AEM_COMMAND_ID,
+  AEM_COPILOT_ANNOTATE_CMD,
+  EXTENSION_ICON_PATH,
   FETCH_ISSUE_DETAIL_CMD,
   PROCESS_COPILOT_CREATE_CMD,
-} from "./constants";
-import { createFolderAndFiles } from "./utils/fileHandler";
-import { fetchBlock } from "./handlers/block.collections";
-import { getRandomGreeting } from "./utils/helpers";
-import { handleIssueManagement } from "./handlers/issueManagement.handler";
+} from "./utils/constants";
+import { createFolderAndFiles } from "./utils/file-handler";
+import { fetchBlock } from "./handlers/collections";
+import { getRandomGreeting, registerAemCopilotTools } from "./utils/helpers";
 
-interface IAemChatResult extends vscode.ChatResult {
-  metadata: {
-    command: string;
-  };
-}
+import { handleIssuesCommand } from "./handlers/github";
+import { handleDocsCommand } from "./handlers/docs";
+import { annotateTextEditor } from "./handlers/annotation";
+import { handleVisionCommand } from "./handlers/vision";
 
-export function activate(context: vscode.ExtensionContext) {
-  // Define a AEM chat handler.
+import { IAemChatResult } from "./interfaces";
+
+export function activate(extensionContext: vscode.ExtensionContext) {
+
+  // register AEM Copilot tools
+  registerAemCopilotTools(extensionContext);
+
   const handler: vscode.ChatRequestHandler = async (
     request: vscode.ChatRequest,
     chatContext: vscode.ChatContext,
     stream: vscode.ChatResponseStream,
     token: vscode.CancellationToken
-  ): Promise<IAemChatResult> => {
+  ): Promise<any> => {
     let cmdResult: any;
+
     stream.progress(vscode.l10n.t(getRandomGreeting()));
+
     try {
       if (request.command === commands.CREATE) {
-        cmdResult = await createCmdHandler(request, stream, token);
+        cmdResult = await createCmdHandler(request, chatContext, stream, token, extensionContext);
         logger.logUsage('request', { kind: commands.CREATE });
       } else if (request.command === commands.COLLECION) {
-        cmdResult = await fetchBlock(request, stream, token, context);
+        cmdResult = await fetchBlock(request, chatContext, stream, token, extensionContext);
         logger.logUsage('request', { kind: commands.COLLECION });
       } else if (request.command === commands.ISSUES) {
-        cmdResult = await handleIssueManagement(request, stream, token);
+        cmdResult = await handleIssuesCommand(request, chatContext, stream, token, extensionContext);
         logger.logUsage('request', { kind: commands.ISSUES });
+      } else if (request.command === commands.VISION) {
+        cmdResult = await handleVisionCommand(request, chatContext, stream, token, extensionContext);
+        logger.logUsage('request', { kind: commands.VISION });
       } else {
-        cmdResult = await handleDocsCommand(request, stream, token);
+        cmdResult = await handleDocsCommand(request, chatContext, stream, token, extensionContext);
+        logger.logUsage('request', { kind: commands.DOCS });  // default command
       }
     } catch (err) {
       handleError(logger, err, stream);
@@ -56,10 +66,9 @@ export function activate(context: vscode.ExtensionContext) {
   };
 
   const aem = vscode.chat.createChatParticipant(AEM_COMMAND_ID, handler);
-  const path = vscode.Uri.joinPath(context.extensionUri, "aem.jpeg");
-  aem.iconPath = path;
+  aem.iconPath = vscode.Uri.joinPath(extensionContext.extensionUri, EXTENSION_ICON_PATH);
 
-  // #TODO: Add followup provider  --> need to check
+
   aem.followupProvider = {
     provideFollowups(
       result: IAemChatResult,
@@ -89,8 +98,7 @@ export function activate(context: vscode.ExtensionContext) {
     }
   });
 
-
-  context.subscriptions.push(aem.onDidReceiveFeedback((feedback: vscode.ChatResultFeedback) => {
+  extensionContext.subscriptions.push(aem.onDidReceiveFeedback((feedback: vscode.ChatResultFeedback) => {
     // Log chat result feedback to be able to compute the success matric of the participant
     // unhelpful / totalRequests is a good success metric
     logger.logUsage('chatResultFeedback', {
@@ -98,7 +106,7 @@ export function activate(context: vscode.ExtensionContext) {
     });
   }));
 
-  context.subscriptions.push(
+  extensionContext.subscriptions.push(
     aem,
     vscode.commands.registerCommand(
       PROCESS_COPILOT_CREATE_CMD,
@@ -108,7 +116,8 @@ export function activate(context: vscode.ExtensionContext) {
     ),
     vscode.commands.registerCommand(FETCH_ISSUE_DETAIL_CMD, async (githubIssue) => {
       vscode.commands.executeCommand(`workbench.action.chat.open`, `@${AEM_COMMAND_ID} /${commands.ISSUES} fetch me details of issue #${githubIssue.number}`);
-    })
+    }),
+    vscode.commands.registerTextEditorCommand(AEM_COPILOT_ANNOTATE_CMD, annotateTextEditor)
   );
 }
 
@@ -132,6 +141,4 @@ function handleError(logger: vscode.TelemetryLogger, err: any, stream: vscode.Ch
   }
 }
 
-
-
-export function deactivate() {}
+export function deactivate() { }

@@ -8,9 +8,9 @@
     "type": "git",
     "url": "https://github.com/adobe/aem-github-copilot"
   },
-  "version": "0.0.6",
+  "version": "0.0.7",
   "engines": {
-    "vscode": "^1.92.0"
+    "vscode": "^1.95.0"
   },
   "extensionDependencies": [
     "github.copilot-chat"
@@ -18,6 +18,23 @@
   "categories": [
     "AI",
     "Chat"
+  ],
+  "keywords": [
+    "chat-participant",
+    "ai",
+    "openai",
+    "anthropic",
+    "gemini",
+    "claude",
+    "vision",
+    "accessibility",
+    "images",
+    "pilot",
+    "co-pilot"
+  ],
+  "enabledApiProposals": [
+    "chatReferenceBinaryData",
+    "codeActionAI"
   ],
   "activationEvents": [],
   "contributes": {
@@ -31,18 +48,88 @@
         "commands": [
           {
             "name": "create",
-            "description": "Given a block name, create corresponding files"
-          },{
-            "name": "collection",
-            "description": "Pull a block from aem block collection repo"
+            "description": "Given a block name, create corresponding files",
+            "disambiguation": [
+              {
+                "category": "aem_createblock",
+                "description": "User wants to create block for AEM Edge Delivery Services",
+                "examples": [
+                  "a table block with 3 columns and 4 rows",
+                  "a carousel block with 5 images"
+                ]
+              }
+            ]
           },
           {
-            "name": "docs",
-            "description": "Information About AEM Edge Delivery Services"
+            "name": "collection",
+            "description": "Pull a block from aem block collection repo",
+            "disambiguation": [
+              {
+                "category": "aem_collection",
+                "description": "User wants to pull a block from AEM Edge Delivery Services block collection",
+                "examples": [
+                  "pull a table block",
+                  "pull a carousel block"
+                ]
+              }
+            ]
           },
           {
             "name": "issues",
-            "description": "Issues management for AEM Edge Delivery Services"
+            "description": "Issues management for AEM Edge Delivery Services and Providing AI suggestions",
+            "disambiguation": [
+              {
+                "category": "aem_issues",
+                "description": "User wants to manage issues for AEM Edge Delivery Services",
+                "examples": [
+                  "create a new issue",
+                  "close an issue",
+                  "fetch latest issue"
+                ]
+              }
+            ]
+          },
+          {
+            "name": "docs",
+            "description": "Information About AEM Edge Delivery Services",
+            "disambiguation": [
+              {
+                "category": "aem_docs",
+                "description": "User wants to know about AEM Edge Delivery Services",
+                "examples": [
+                  "what is AEM Edge Delivery Services",
+                  "how to use AEM Edge Delivery Services",
+                  "how authentication works in AEM Edge Delivery Services"
+                ]
+              }
+            ]
+          },
+          {
+            "name": "vision",
+            "description": "create AEM Edge Delivery Services block using vision",
+            "disambiguation": [
+              {
+                "category": "aem_vision",
+                "description": "User wants to create AEM Edge Delivery Services block using vision with given image",
+                "examples": [
+                  "create a block as shown in the image"
+                ]
+              }
+            ]
+          }
+        ],
+        "disambiguation": [
+          {
+            "category": "aem",
+            "description": "User wants to interact with AEM Assistant",
+            "examples": [
+              "create a table block",
+              "pull a carousel block",
+              "create a new issue",
+              "fetch latest issue",
+              "what is AEM Edge Delivery Services",
+              "create a block as shown in the image"
+            ]
           }
         ]
       }
@@ -51,8 +138,243 @@
       {
         "command": "aem.createFiles",
         "title": "create files/folders for edge delivery services block"
+      },
+      {
+        "command": "aem_copilot.annotate",
+        "title": "AEM Copilot Annotations",
+        "icon": "/resources/logo.png"
       }
-    ]
+    ],
+    "menus": {
+      "editor/title": [
+        {
+          "command": "aem_copilot.annotate",
+          "group": "navigation"
+        }
+      ]
+    },
+    "languageModelTools": [
+      {
+        "name": "aem_copilot_github_fetchIssueDetails",
+        "tags": [
+          "github",
+          "get-github-issue",
+          "aem-copilot-tools"
+        ],
+        "toolReferenceName": "aem_copilot_github_fetchIssueDetails",
+        "displayName": "Test Github Issues",
+        "modelDescription": "Test Github Issues",
+        "icon": "$(git-fetch)",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "issueNumber": {
+              "type": "number",
+              "description": "Github Issue Number"
+            }
+          },
+          "required": [
+            "issueNumber"
+          ]
+        }
+      },
+      {
+        "name": "aem_copilot_github_createIssue",
+        "tags": [
+          "github",
+          "create-github-issue",
+          "aem-copilot-tools"
+        ],
+        "toolReferenceName": "aem_copilot_github_createIssue",
+        "displayName": "Create Github Issue",
+        "modelDescription": "Create Github Issue",
+        "icon": "$(files)",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "title": {
+              "type": "string",
+              "description": "Issue Title",
+              "default": "New Issue"
+            },
+            "body": {
+              "type": "string",
+              "description": "Issue Body",
+              "default": "Issue Body"
+            }
+          },
+          "required": [
+            "title",
+            "body"
+          ]
+        }
+      },
+      {
+        "name": "aem_copilot_github_closeIssue",
+        "tags": [
+          "github",
+          "aem-copilot-tools"
+        ],
+        "toolReferenceName": "aem_copilot_github_closeIssue",
+        "displayName": "Close Github Issue",
+        "modelDescription": "Close Github Issue",
+        "icon": "$(files)",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "issueNumber": {
+              "type": "number",
+              "description": "Github Issue Number"
+            }
+          },
+          "required": [
+            "issueNumber"
+          ]
+        }
+      },
+      {
+        "name": "aem_copilot_github_fetchLatestIssue",
+        "tags": [
+          "github",
+          "aem-copilot-tools"
+        ],
+        "toolReferenceName": "aem_copilot_github_fetchLatestIssue",
+        "displayName": "Fetch Latest Github Issue",
+        "modelDescription": "Fetch Latest Github Issue",
+        "icon": "$(files)",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "repo": {
+              "type": "string",
+              "description": "Github Repository"
+            }
+          },
+          "required": [
+            "repo"
+          ]
+        }
+      },
+      {
+        "name": "aem_copilot_github_fetchAssignedIssue",
+        "tags": [
+          "github",
+          "aem-copilot-tools"
+        ],
+        "toolReferenceName": "aem_copilot_github_fetchAssignedIssue",
+        "displayName": "Fetch Assigned Github Issue",
+        "modelDescription": "Fetch Assigned Github Issue",
+        "icon": "$(files)",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "repo": {
+              "type": "string",
+              "description": "Github Repository"
+            },
+            "username": {
+              "type": "string",
+              "description": "Github Username"
+            }
+          },
+          "required": [
+            "repo"
+          ]
+        }
+      },
+      {
+        "name": "aem_copilot_docsIdentifier",
+        "tags": [
+          "editors",
+          "chat-tools-sample"
+        ],
+        "toolReferenceName": "aem_copilot_docsIdentifier",
+        "displayName": "AEM Edge Delivery Services Docs Identifier",
+        "modelDescription": "AEM Edge Delivery Services Docs Identifier",
+        "icon": "$(files)",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "query": {
+              "type": "string",
+              "description": "User prompt to identify the docs"
+            }
+          },
+          "required": [
+            "query"
+          ]
+        }
+      },
+      {
+        "name": "aem_copilot_runInTerminal",
+        "tags": [
+          "terminal",
+          "aem-copilot-tools"
+        ],
+        "displayName": "Run in Terminal",
+        "modelDescription": "Run a command in a terminal and return the output",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "command": {
+              "type": "string",
+              "description": "The command to run"
+            }
+          },
+          "required": [
+            "command"
+          ]
+        }
+      },
+      {
+        "name": "aem_copilot_findFiles",
+        "tags": [
+          "files",
+          "search",
+          "aem-copilot-tools"
+        ],
+        "displayName": "Find Files",
+        "toolReferenceName": "aem_copilot_findFiles",
+        "modelDescription": "Search for files in the current workspace",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "pattern": {
+              "type": "string",
+              "description": "Search for files that match this glob pattern"
+            }
+          },
+          "required": [
+            "pattern"
+          ]
+        }
+      }
+    ],
+    "configuration": {
+      "title": "Azure OpenAI Configuration For Vision Command",
+      "properties": {
+        "extension.apiKey": {
+          "type": "string",
+          "default": "",
+          "description": "API Key for the extension"
+        },
+        "extension.endpoint": {
+          "type": "string",
+          "default": "",
+          "description": "Endpoint for the extension"
+        },
+        "extension.apiVersion": {
+          "type": "string",
+          "default": "",
+          "description": "API Version for the extension"
+        },
+        "extension.deploymentName": {
+          "type": "string",
+          "default": "",
+          "description": "Deployment Name for the extension"
+        }
+      }
+    }
   },
   "main": "./dist/extension.js",
   "scripts": {
@@ -71,23 +393,26 @@
     "@octokit/rest": "^20.1.1",
     "@types/jsdom": "^21.1.6",
     "@types/mocha": "^10.0.6",
-    "@types/node": "^20.5.9",
-    "@types/vscode": "1.90.0",
+    "@types/node": "^20",
+    "@types/vscode": "^1.95.0",
     "@typescript-eslint/eslint-plugin": "^7.16.1",
     "@typescript-eslint/parser": "^7.16.1",
-    "@vscode/prompt-tsx": "^0.2.9-alpha",
     "@vscode/test-cli": "^0.0.9",
     "@vscode/test-electron": "^2.4.0",
     "eslint": "^8.57.0",
     "run-script-os": "^1.1.6",
+    "simple-git": "^3.27.0",
     "ts-loader": "^9.5.1",
     "tslint": "^6.1.3",
     "typescript": "^5.5.2",
     "webpack": "^5.91.0",
-    "webpack-cli": "^5.1.4",
-    "simple-git": "^3.24.0"
+    "webpack-cli": "^5.1.4"
   },
   "dependencies": {
-    "jsdom": "^24.1.0"
+    "@vscode/chat-extension-utils": "^0.0.0-alpha.1",
+    "@vscode/prompt-tsx": "^0.3.0-alpha.12",
+    "applicationinsights": "^3.4.0",
+    "jsdom": "^24.1.0",
+    "openai": "^4.76.3"
   }
 }
