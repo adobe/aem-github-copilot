@@ -397,7 +397,7 @@
     "@types/vscode": "^1.95.0",
     "@typescript-eslint/eslint-plugin": "^7.16.1",
     "@typescript-eslint/parser": "^7.16.1",
-    "@vscode/test-cli": "^0.0.9",
+    "@vscode/test-cli": "^0.0.10",
     "@vscode/test-electron": "^2.4.0",
     "eslint": "^8.57.0",
     "run-script-os": "^1.1.6",
