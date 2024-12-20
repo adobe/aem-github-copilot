@@ -7,7 +7,6 @@ import {
 import {
   AEM_COMMAND_ID,
   AEM_COPILOT_ANNOTATE_CMD,
-  AZURE_APP_INSIGHTS_CONN_STR,
   EXTENSION_ICON_PATH,
   FETCH_ISSUE_DETAIL_CMD,
   PROCESS_COPILOT_CREATE_CMD,
@@ -22,7 +21,6 @@ import { annotateTextEditor } from "./handlers/annotation";
 import { handleVisionCommand } from "./handlers/vision";
 
 import { IAemChatResult } from "./interfaces";
-import * as telemetry from "./utils/telemetry";
 
 export function activate(extensionContext: vscode.ExtensionContext) {
 
@@ -87,7 +85,18 @@ export function activate(extensionContext: vscode.ExtensionContext) {
     },
   };
 
-  const logger = telemetry.init();
+  const logger = vscode.env.createTelemetryLogger({
+    sendEventData(eventName, data) {
+      // Capture event telemetry
+      console.log(`Event: ${eventName}`);
+      console.log(`Data: ${JSON.stringify(data)}`);
+    },
+    sendErrorData(error, data) {
+      // Capture error telemetry
+      console.error(`Error: ${error}`);
+      console.error(`Data: ${JSON.stringify(data)}`);
+    }
+  });
 
   extensionContext.subscriptions.push(aem.onDidReceiveFeedback((feedback: vscode.ChatResultFeedback) => {
     // Log chat result feedback to be able to compute the success matric of the participant
