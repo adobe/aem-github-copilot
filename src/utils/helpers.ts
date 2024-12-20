@@ -220,7 +220,7 @@ export async function readFileContent(path: string): Promise<string> {
     return fileContentString;
   } catch (error) {
     console.error("Error reading file", error);
-    throw error;
+    return "";
   }
 }
 
