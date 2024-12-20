@@ -86,4 +86,4 @@ Make sure to update the version number in [package.json](http://_vscodecontentre
 
 Check out the demo to see the extension in action:
 
-![Demo](/resources/demo.gif)
+![Demo](https://github.com/adobe/aem-github-copilot/blob/main/resources/demo.gif?raw=true)
